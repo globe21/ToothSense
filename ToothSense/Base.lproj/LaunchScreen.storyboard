@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="16A313a" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="EHf-IW-A2E">
+            <objects>
+                <viewController id="01J-lp-oVM" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Llm-lL-Icb"/>
+                        <viewControllerLayoutGuide type="bottom" id="xb3-aO-Qok"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ToothsenseBackground2" translatesAutoresizingMaskIntoConstraints="NO" id="gV1-aN-cYr"/>
+                        </subviews>
+                        <color key="backgroundColor" red="0.97573274374008179" green="0.64573812484741211" blue="0.2609698474407196" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="gV1-aN-cYr" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="7K0-bf-H26"/>
+                            <constraint firstItem="gV1-aN-cYr" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="QKR-sx-bHV"/>
+                            <constraint firstItem="gV1-aN-cYr" firstAttribute="height" secondItem="Ze5-6b-2t3" secondAttribute="height" id="Tuk-mI-nYt"/>
+                            <constraint firstItem="gV1-aN-cYr" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" id="UFC-v4-t8N"/>
+                        </constraints>
+                    </view>
+                    <nil key="simulatedStatusBarMetrics"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="53" y="375"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="ToothsenseBackground2" width="3000" height="4746"/>
+    </resources>
+</document>
