@@ -11,6 +11,8 @@ import UIKit
 import AVKit
 import AVFoundation
 import CoreGraphics
+import Parse
+import ParseUI
 
 extension SmilesViewController {
     func getMyProgress(user: PFUser) {

@@ -15,6 +15,8 @@
 //
 
 import Foundation
+import Parse
+import ParseUI
 
 public struct ImageRowSourceTypes : OptionSetType {
     

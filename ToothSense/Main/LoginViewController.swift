@@ -8,6 +8,8 @@
 
 import UIKit
 import QuartzCore
+import Parse
+import ParseUI
 //import BEMCheckBox
 
 class LoginViewController: UIViewController, UITextFieldDelegate, NavgationTransitionable, BEMCheckBoxDelegate {

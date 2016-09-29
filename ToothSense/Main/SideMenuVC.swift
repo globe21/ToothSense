@@ -16,6 +16,8 @@ import CoreImage
 import OpenGLES
 import QuartzCore
 import CoreVideo
+import Parse
+import ParseUI
 
 
 let BuildController:BuildViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("BuildViewController") as! BuildViewController

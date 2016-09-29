@@ -11,6 +11,8 @@ import Foundation
 import UIKit
 import UserNotifications
 import UserNotificationsUI
+import Parse
+import ParseUI
 
 var Followers: [PFUser] = [PFUser]()
 var Following: [PFUser] = [PFUser]()

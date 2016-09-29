@@ -3,8 +3,8 @@
 //
 
 #import "ProgressHUD.h"
-#import "Parse/Parse.h"
-#import "ParseUI/ParseUI.h"
+#import <Parse/Parse.h>
+#import <ParseUI/ParseUI.h>
 
 #import "UIScrollView+EmptyDataSet.h"
 

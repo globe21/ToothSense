@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Parse
+import ParseUI
 //import Fabric
 //import Crashlytics
 import UserNotifications
