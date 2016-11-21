@@ -217,7 +217,8 @@ class FriendListViewController: UIViewController, UITableViewDataSource, UITable
     
     override func viewWillAppear(animated: Bool) {
         addHamMenu()
-        removeBack()
+        addBackButton()
+        //removeBack()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -380,6 +381,38 @@ public class FollowCell : UITableViewCell {
         didSet {
             Follower!.settingUpCell(self)
         }
+    }
+    
+    
+    func showReportUser(user: PFUser) {
+        let popVC = PopupReportTextViewController(nibName: "PopupReportTextViewController", bundle: nil)
+        let popup = PopupDialog(viewController: popVC, transitionStyle: .BounceUp, buttonAlignment: .Horizontal, gestureDismissal: true)
+        let buttonCancel = CancelButton(title: "CANCEL") { }
+        let buttonTwo = DestructiveButton(title: "REPORT") {
+            if popVC.reportTextView.text == nil {
+                popVC.reportTextView.shake()
+            } else {
+                let text: String = popVC.reportTextView.text!
+                let object: PFObject = PFObject(className: "BlockReport")
+                object["User"] = user
+                object["Description"] = text
+                object.saveInBackgroundWithBlock({ (success, error) in
+                    if error == nil {
+                        let popup2 = PopupDialog(title: "Report Received", message: text, image: nil)
+                        let buttonCancel = CancelButton(title: "OK") { }
+                        popup2.addButtons([buttonCancel])
+                        self.getParentViewController()!.presentViewController(popup2, animated: true, completion: nil)
+                    } else {
+                        let popup2 = PopupDialog(title: "Report Failed To Send!", message: error!.localizedDescription, image: nil)
+                        let buttonCancel = CancelButton(title: "OK") { }
+                        popup2.addButtons([buttonCancel])
+                        self.getParentViewController()!.presentViewController(popup2, animated: true, completion: nil)
+                    }
+                })
+            }
+        }
+        popup.addButtons([buttonCancel, buttonTwo])
+        self.getParentViewController()!.presentViewController(popup, animated: true, completion: nil)
     }
     
     

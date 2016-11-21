@@ -16,9 +16,6 @@ import UserNotificationsUI
 
 let kConstantObj = kConstant()
 var sideMenuNavigationController : UINavigationController?
-var sideMenuNavigationController2 : UINavigationController?
-var sideMenuNavigationController3 : UINavigationController?
-
 var tabController: RAMAnimatedTabBarController?
 let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 let screenBounds = UIScreen.mainScreen().bounds
@@ -191,12 +188,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 let alert = UIAlertController(title: "Close this app", message: "A local notification has been scheduled. Close this app and wait 10 sec.", preferredStyle: UIAlertControllerStyle.Alert)
                 let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
                 alert.addAction(okAction)
-                switch tabController!.selectedIndex {
+                sideMenuNavigationController!.topViewController!.presentViewController(alert, animated: true, completion: nil)
+                /*switch tabController!.selectedIndex {
                 case 0:sideMenuNavigationController!.topViewController!.presentViewController(alert, animated: true, completion: nil)
                 case 1:sideMenuNavigationController2!.topViewController!.presentViewController(alert, animated: true, completion: nil)
                 case 2:sideMenuNavigationController3!.topViewController!.presentViewController(alert, animated: true, completion: nil)
                 default:break
-                }
+                }*/
             }
         }
         completionHandler()
@@ -237,8 +235,6 @@ public struct AppConfiguration {
     public static var ToothBadge4 = Images.resizeImage(UIImage(named: "ToothHero")!, width: UIImage(named: "ToothHero")!.size.width/12, height: UIImage(named: "ToothHero")!.size.height/12)
     
     public static var addTooth : UIImage = Images.resizeImage(UIImage(named: "AddTooth")!, width: UIImage(named: "AddTooth")!.size.width/3.5, height: UIImage(named: "AddTooth")!.size.height/3.5)!
-    //public static var addTooth : UIImage = Images.resizeImage(UIImage(named: "InsertTooth")!, width: UIImage(named: "AddTooth")!.size.width/3, height: UIImage(named: "AddTooth")!.size.height/3)!
-    //public static var addTooth : UIImage = Images.resizeImage(UIImage(named: "ManualTooth")!, width: UIImage(named: "AddTooth")!.size.width/3, height: UIImage(named: "AddTooth")!.size.height/3)!
     
     public static var navColor: UIColor = UIColor(red: 0.697961986064911, green: 0.698083817958832, blue: 0.69795435667038, alpha: 1.0)
     public static var tealColor: UIColor = UIColor(red: 0.347532421350479, green: 0.671598851680756, blue: 0.669063985347748, alpha: 1.0)

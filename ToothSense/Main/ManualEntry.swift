@@ -30,7 +30,7 @@ class ManualEntry : FormViewController, NavgationTransitionable {
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         self.title = "Entering Brushing"
-        sideMenuNavigationController2!.tr_popToRootViewController()
+        sideMenuNavigationController!.tr_popToRootViewController()
         Flossed = false
         AMBrush = false
     }

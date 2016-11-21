@@ -37,13 +37,17 @@ public class CheetahProperty {
             update()
         }
         if let spring = spring {
-            if let completion = completion where spring.ended {
-                completion()
+            if let completion = completion {
+                if spring.ended {
+                    completion()
+                }
             }
             return spring.ended
         } else {
-            if let completion = completion where elapsed >= end {
-                completion()
+            if let completion = completion {
+                if elapsed >= end {
+                    completion()
+                }
             }
             return elapsed >= end
         }

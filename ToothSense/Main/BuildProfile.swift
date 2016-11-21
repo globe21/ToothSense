@@ -53,8 +53,9 @@ class BuildViewController : FormViewController, NavgationTransitionable {
     var PMChanged: Bool = false
     
     override func viewWillAppear(animated: Bool) {
-        removeBack()
+        //removeBack()
         addHamMenu()
+        addBackButton()
     }
     
     override func viewWillDisappear(animated: Bool) {

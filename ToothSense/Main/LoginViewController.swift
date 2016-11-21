@@ -21,6 +21,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, NavgationTrans
     @IBOutlet weak var loginButton:     UIButton!
     @IBOutlet weak var signupButton: UIButton!
     @IBOutlet weak var forgotButton: UIButton!
+    @IBOutlet weak var questionButton: UIButton!
     @IBOutlet weak var customCheckbox: BEMCheckBox!
     
     var tr_pushTransition: TRNavgationTransitionDelegate?
@@ -55,15 +56,14 @@ class LoginViewController: UIViewController, UITextFieldDelegate, NavgationTrans
         signupButton.addTarget(self, action: #selector(LoginViewController.signupPressed), forControlEvents: UIControlEvents.TouchUpInside)
         loginButton.addTarget(self, action: #selector(LoginViewController.buttonPressed), forControlEvents: UIControlEvents.TouchUpInside)
         forgotButton.addTarget(self, action: #selector(LoginViewController.forgotPressed), forControlEvents: UIControlEvents.TouchUpInside)
-        /*
-        // Visual Effect View for background
-        let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: UIBlurEffectStyle.Light)) as UIVisualEffectView
-        visualEffectView.frame = self.view.frame
-        visualEffectView.alpha = 0.5
-        view.insertSubview(visualEffectView, belowSubview: self.view)
-        //insertSubview(visualEffectView, atIndex: 0)
-        */
+        questionButton.addTarget(self, action: #selector(LoginViewController.tappedQuestion), forControlEvents: UIControlEvents.TouchUpInside)
         self.loginButton(false)
+    }
+    
+    
+    func tappedQuestion(sender: UIButton) {
+        sideMenuNavigationController = UINavigationController(rootViewController: UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("SendQuestion"))
+        self.presentViewController(sideMenuNavigationController!, animated: true, completion: nil)
     }
     
     override func viewDidLoad() {
@@ -76,7 +76,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, NavgationTrans
     }
     
     func animationDidStopForCheckBox(checkBox:BEMCheckBox) {
-    
+        
     }
     
     func loginsignupEmailSaveCheck() {
@@ -185,8 +185,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, NavgationTrans
     func forgotPressed(sender: AnyObject) {
         let popVC = PopupTextViewController(nibName: "PopupTextViewController", bundle: nil)
         let popup = PopupDialog(viewController: popVC, transitionStyle: .BounceUp, buttonAlignment: .Horizontal, gestureDismissal: true)
-        let buttonCancel = CancelButton(title: "CANCEL") {
-        }
+        let buttonCancel = CancelButton(title: "CANCEL") { }
         let buttonTwo = DefaultButton(title: "SEND") {
             print(popVC.emailTextField.text)
             if popVC.emailTextField.text == nil {
@@ -196,14 +195,12 @@ class LoginViewController: UIViewController, UITextFieldDelegate, NavgationTrans
                 PFUser.requestPasswordResetForEmailInBackground(text, block: { (success, error) in
                     if error == nil {
                         let popup2 = PopupDialog(title: "Email Sent!", message: "We've sent an email to \(text) with instructions on how to reset your password.", image: nil)
-                        let buttonCancel = CancelButton(title: "OK") {
-                        }
+                        let buttonCancel = CancelButton(title: "OK") { }
                         popup2.addButtons([buttonCancel])
                         self.presentViewController(popup2, animated: true, completion: nil)
                     } else {
                         let popup2 = PopupDialog(title: "Email Failed To Send!", message: error!.localizedDescription, image: nil)
-                        let buttonCancel = CancelButton(title: "OK") {
-                        }
+                        let buttonCancel = CancelButton(title: "OK") { }
                         popup2.addButtons([buttonCancel])
                         self.presentViewController(popup2, animated: true, completion: nil)
                     }
@@ -217,3 +214,38 @@ class LoginViewController: UIViewController, UITextFieldDelegate, NavgationTrans
     
 }
 
+
+extension UIViewController {
+    
+    func showReportUser(user: PFUser) {
+        let popVC = PopupReportTextViewController(nibName: "PopupReportTextViewController", bundle: nil)
+        let popup = PopupDialog(viewController: popVC, transitionStyle: .BounceUp, buttonAlignment: .Horizontal, gestureDismissal: true)
+        let buttonCancel = CancelButton(title: "CANCEL") { }
+        let buttonTwo = DestructiveButton(title: "REPORT") {
+            if popVC.reportTextView.text == nil {
+                popVC.reportTextView.shake()
+            } else {
+                let text: String = popVC.reportTextView.text!
+                let object: PFObject = PFObject(className: "BlockReport")
+                object["User"] = user
+                object["Description"] = text
+                object.saveInBackgroundWithBlock({ (success, error) in
+                    if error == nil {
+                        let popup2 = PopupDialog(title: "Report Received", message: text, image: nil)
+                        let buttonCancel = CancelButton(title: "OK") { }
+                        popup2.addButtons([buttonCancel])
+                        self.presentViewController(popup2, animated: true, completion: nil)
+                    } else {
+                        let popup2 = PopupDialog(title: "Report Failed To Send!", message: error!.localizedDescription, image: nil)
+                        let buttonCancel = CancelButton(title: "OK") { }
+                        popup2.addButtons([buttonCancel])
+                        self.presentViewController(popup2, animated: true, completion: nil)
+                    }
+                })
+            }
+        }
+        popup.addButtons([buttonCancel, buttonTwo])
+        self.presentViewController(popup, animated: true, completion: nil)
+    }
+    
+}

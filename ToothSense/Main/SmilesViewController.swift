@@ -14,7 +14,7 @@ import CoreGraphics
 import Parse
 import ParseUI
 
-extension SmilesViewController {
+extension UIViewController {
     func getMyProgress(user: PFUser) {
         var progress: CGFloat = 0.05
         let userQuery = PFUser.query()
@@ -41,10 +41,50 @@ extension SmilesViewController {
                 loader.average = 0.0
                 loader.progress = progress
             }
-            self.forceFetchData()
+            if self is SmilesViewController {
+                (self as! SmilesViewController).forceFetchData()
+            }
         })
     }
 }
+
+public enum BadgeType: Int, CustomStringConvertible {
+    case CavityMaker = 0
+    case SugarBug
+    case ToothProtector
+    case ToothHero
+    
+    public var image: UIImage {
+        get {
+            switch self {
+            case .CavityMaker:
+                return UIImage(named: "CavityMaker")!
+            case .SugarBug:
+                return UIImage(named: "sugarbugs")!
+            case .ToothProtector:
+                return UIImage(named: "ToothProtector")!
+            case .ToothHero:
+                return UIImage(named: "ToothHero")!
+            }
+        }
+    }
+    
+    public var description: String {
+        get {
+            switch self {
+            case .CavityMaker:
+                return "CavityMaker"
+            case .SugarBug:
+                return "sugarbugs"
+            case .ToothProtector:
+                return "ToothProtector"
+            case .ToothHero:
+                return "ToothHero"
+            }
+        }
+    }
+}
+
 
 class SmilesCollectionViewCell: UICollectionViewCell {
     
@@ -55,124 +95,157 @@ class SmilesCollectionViewCell: UICollectionViewCell {
     var BrushBadge: UIImageView!
     var FlossBadge: UIImageView!
     
+    var type: BadgeType = .CavityMaker {
+        didSet {
+            BrushBadge.image = self.type.image
+        }
+    }
+    
+    var Floss: Bool = false {
+        didSet {
+            if self.Floss == true {
+                self.FlossBadge.image = UIImage(named: "flossicon")!
+            } else {
+                self.FlossBadge.image = nil
+            }
+        }
+    }
+    
+    var object: PFObject!
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.layer.cornerRadius = 12
         contentView.layer.masksToBounds = true
-        if UIScreen.mainScreen().bounds.size.height >= 736 {
-            CellImage = PFImageView(frame: CGRect(x: contentView.frame.minX + 5, y: contentView.frame.minY + 5, width: contentView.frame.height - 10, height: contentView.frame.height - 10))
-            CellImage.contentMode = .ScaleAspectFill
-            contentView.addSubview(CellImage)
-            FlossBadge = UIImageView(frame: CGRect(x: screenBounds.width - 110, y: 5, width: 50, height: 50))
-            FlossBadge.contentMode = .ScaleAspectFit
-            FlossBadge.backgroundColor = UIColor.clearColor()
-            contentView.addSubview(FlossBadge)
-            BrushBadge = UIImageView(frame: CGRect(x: screenBounds.width - 60, y: 5, width: 50, height: 50))
-            BrushBadge.contentMode = .ScaleAspectFit
-            BrushBadge.backgroundColor = UIColor.clearColor()
-            contentView.addSubview(BrushBadge)
-            TimeLabel = UILabel(frame: CGRect(x: screenBounds.width - 110, y: 60, width: 110, height: 50))
-            TimeLabel.textAlignment = NSTextAlignment.Center
-            TimeLabel.adjustsFontSizeToFitWidth = true
-            contentView.addSubview(TimeLabel)
-            let widther = (screenBounds.width - 110) - (contentView.frame.height + 20)
-            userLabel = UILabel(frame: CGRect(x: contentView.frame.height + 5, y: 5, width: widther, height: 55))
-            userLabel.textAlignment = NSTextAlignment.Left
-            userLabel.adjustsFontSizeToFitWidth = true
-            contentView.addSubview(userLabel)
-            AgeLabel = UILabel(frame: CGRect(x: contentView.frame.height + 5, y: 55, width: widther, height: 55))
-            AgeLabel.textAlignment = NSTextAlignment.Left
-            AgeLabel.adjustsFontSizeToFitWidth = true
-            contentView.addSubview(AgeLabel)
-        } else if UIScreen.mainScreen().bounds.size.height < 736 && UIScreen.mainScreen().bounds.size.height >= 667 {
-            CellImage = PFImageView(frame: CGRect(x: contentView.frame.minX + 5, y: contentView.frame.minY + 5, width: contentView.frame.height - 10, height: contentView.frame.height - 10))
-            CellImage.contentMode = .ScaleAspectFill
-            contentView.addSubview(CellImage)
-            FlossBadge = UIImageView(frame: CGRect(x: screenBounds.width - 110, y: 5, width: 50, height: 50))
-            FlossBadge.contentMode = .ScaleAspectFit
-            FlossBadge.backgroundColor = UIColor.clearColor()
-            contentView.addSubview(FlossBadge)
-            BrushBadge = UIImageView(frame: CGRect(x: screenBounds.width - 60, y: 5, width: 50, height: 50))
-            BrushBadge.contentMode = .ScaleAspectFit
-            BrushBadge.backgroundColor = UIColor.clearColor()
-            contentView.addSubview(BrushBadge)
-            TimeLabel = UILabel(frame: CGRect(x: screenBounds.width - 110, y: 60, width: 110, height: 50))
-            TimeLabel.textAlignment = NSTextAlignment.Center
-            TimeLabel.adjustsFontSizeToFitWidth = true
-            contentView.addSubview(TimeLabel)
-            let widther = (screenBounds.width - 110) - (contentView.frame.height + 15)
-            userLabel = UILabel(frame: CGRect(x: contentView.frame.height, y: 5, width: widther, height: 55))
-            userLabel.textAlignment = NSTextAlignment.Left
-            userLabel.adjustsFontSizeToFitWidth = true
-            contentView.addSubview(userLabel)
-            AgeLabel = UILabel(frame: CGRect(x: contentView.frame.height, y: 55, width: widther, height: 55))
-            AgeLabel.textAlignment = NSTextAlignment.Left
-            AgeLabel.adjustsFontSizeToFitWidth = true
-            contentView.addSubview(AgeLabel)
+        if screenBounds.size.height >= 736 {
+            CellImage = PFImageView(frame: CGRect(x: 2.5, y: 5, width: 110, height: 110))
+            FlossBadge = UIImageView(frame: CGRect(x: screenBounds.width - 115, y: 3.33333, width: 55, height: 55))
+            BrushBadge = UIImageView(frame: CGRect(x: screenBounds.width - 57.5, y: 3.33333, width: 55, height: 55))
+            TimeLabel = UILabel(frame: CGRect(x: screenBounds.width - 105, y: 61.66666, width: 72.5, height: 55))
+            userLabel = UILabel(frame: CGRect(x: CellImage.frame.maxX + 5, y: 3.33333, width: (FlossBadge.frame.minX - 2.5) - (CellImage.frame.maxX + 5), height: 55))
+            AgeLabel = UILabel(frame: CGRect(x: CellImage.frame.maxX + 5, y: 61.66666, width: (FlossBadge.frame.minX - 2.5) - (CellImage.frame.maxX + 5), height: 55))
+        } else if screenBounds.size.height < 736 && screenBounds.size.height >= 667 {
+            CellImage = PFImageView(frame: CGRect(x: 2.5, y: 5, width: 90, height: 90))
+            FlossBadge = UIImageView(frame: CGRect(x: screenBounds.width - 95, y: 3.33333, width: 45, height: 45))
+            BrushBadge = UIImageView(frame: CGRect(x: screenBounds.width - 47.5, y: 3.33333, width: 45, height: 45))
+            TimeLabel = UILabel(frame: CGRect(x: screenBounds.width - 95, y: 51.66666, width: 92.5, height: 45))
+            userLabel = UILabel(frame: CGRect(x: CellImage.frame.maxX + 5, y: 3.33333, width: (FlossBadge.frame.minX - 2.5) - (CellImage.frame.maxX + 5), height: 45))
+            AgeLabel = UILabel(frame: CGRect(x: CellImage.frame.maxX + 5, y: 51.66666, width: (FlossBadge.frame.minX - 2.5) - (CellImage.frame.maxX + 5), height: 45))
         } else {
-            CellImage = PFImageView(frame: CGRect(x: contentView.frame.minX + 2.5, y: contentView.frame.midY - ((contentView.frame.height/2 + 10)/2), width: contentView.frame.height/2 + 10, height: contentView.frame.height/2 + 10))
-            CellImage.contentMode = .ScaleAspectFill
-            contentView.addSubview(CellImage)
-            FlossBadge = UIImageView(frame: CGRect(x: screenBounds.width - 115, y: 5, width: 55, height: 55))
-            FlossBadge.contentMode = .ScaleAspectFit
-            FlossBadge.backgroundColor = UIColor.clearColor()
-            contentView.addSubview(FlossBadge)
-            BrushBadge = UIImageView(frame: CGRect(x: screenBounds.width - 55, y: 5, width: 55, height: 55))
-            BrushBadge.contentMode = .ScaleAspectFit
-            BrushBadge.backgroundColor = UIColor.clearColor()
-            contentView.addSubview(BrushBadge)
-            TimeLabel = UILabel(frame: CGRect(x: screenBounds.width - 115, y: 70, width: 115, height: 35))
-            TimeLabel.textAlignment = NSTextAlignment.Center
-            TimeLabel.adjustsFontSizeToFitWidth = true
-            contentView.addSubview(TimeLabel)
-            let widther = (screenBounds.width - 100) - ((contentView.frame.height/2) + 17.5)
-            userLabel = UILabel(frame: CGRect(x: (contentView.frame.height/2) + 17.5, y: 5, width: widther, height: 55))
-            userLabel.textAlignment = NSTextAlignment.Left
-            userLabel.adjustsFontSizeToFitWidth = true
-            contentView.addSubview(userLabel)
-            AgeLabel = UILabel(frame: CGRect(x: (contentView.frame.height/2) + 17.5, y: 70, width: widther, height: 35))
-            AgeLabel.textAlignment = NSTextAlignment.Left
-            AgeLabel.adjustsFontSizeToFitWidth = true
-            contentView.addSubview(AgeLabel)
+            CellImage = PFImageView(frame: CGRect(x: 2.5, y: 5, width: 70, height: 70))
+            FlossBadge = UIImageView(frame: CGRect(x: screenBounds.width - 85, y: 3.33333, width: 35, height: 35))
+            BrushBadge = UIImageView(frame: CGRect(x: screenBounds.width - 37.5, y: 3.33333, width: 35, height: 35))
+            TimeLabel = UILabel(frame: CGRect(x: screenBounds.width - 85, y: 41.66666, width: 72.5, height: 35))
+            userLabel = UILabel(frame: CGRect(x: CellImage.frame.maxX + 5, y: 3.33333, width: (FlossBadge.frame.minX - 2.5) - (CellImage.frame.maxX + 5), height: 35))
+            AgeLabel = UILabel(frame: CGRect(x: CellImage.frame.maxX + 5, y: 41.66666, width: (FlossBadge.frame.minX - 2.5) - (CellImage.frame.maxX + 5), height: 35))
         }
+        CellImage.contentMode = .ScaleAspectFill
+        CellImage.image = UIImage(named: "ProfileIcon")
+        //CellImage.layer.cornerRadius = (CellImage.frame.height) / 2
+        CellImage.layer.cornerRadius = 12
+        CellImage.tintColor = AppConfiguration.navText
+        CellImage.layer.borderColor = UIColor.clearColor().CGColor
+        CellImage.layer.borderWidth = 4.0
+        CellImage.backgroundColor = UIColor.clearColor()
+        CellImage.layer.masksToBounds = true
+        contentView.addSubview(CellImage)
+        FlossBadge.contentMode = .ScaleAspectFit
+        FlossBadge.backgroundColor = UIColor.clearColor()
+        contentView.addSubview(FlossBadge)
+        BrushBadge.contentMode = .ScaleAspectFit
+        BrushBadge.backgroundColor = UIColor.clearColor()
+        contentView.addSubview(BrushBadge)
+        TimeLabel.textAlignment = NSTextAlignment.Center
+        TimeLabel.adjustsFontSizeToFitWidth = true
+        contentView.addSubview(TimeLabel)
+        userLabel.textAlignment = NSTextAlignment.Left
+        userLabel.adjustsFontSizeToFitWidth = true
+        userLabel.attributedText = NSMutableAttributedString(string: "Loading..", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
+        contentView.addSubview(userLabel)
+        AgeLabel.textAlignment = NSTextAlignment.Left
+        AgeLabel.adjustsFontSizeToFitWidth = true
+        AgeLabel.attributedText = NSMutableAttributedString(string: "Age: 0", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 27.0)!])
+        contentView.addSubview(AgeLabel)
     }
     
-    func setObject(object: PFObject) {
-        CellImage.image = UIImage(named: "ProfileIcon")
-        userLabel.attributedText = NSMutableAttributedString(string: "Loading..", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
-        AgeLabel.attributedText = NSMutableAttributedString(string: "Age: 0", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 27.0)!])
+    
+    func setupCell() {
         if object["User"] != nil {
-            (object["User"] as! PFUser).settingUpCellCollection(self, objectPassed: object)
+            let user: PFUser = object["User"] as! PFUser
+            let userQuery = PFUser.query()
+            userQuery?.getObjectInBackgroundWithId(user.objectId!, block: { (user, error) in
+                if error == nil {
+                    let user = user as! PFUser
+                    if user["thumbnail"] != nil {
+                        self.CellImage.file = user["thumbnail"] as? PFFile
+                        self.CellImage.loadInBackground() { image, error in
+                            if error == nil {
+                                self.CellImage.layer.borderColor = AppConfiguration.navText.CGColor
+                            }
+                        }
+                    } else if self.object["userPic"] != nil {
+                        self.CellImage.file = self.object["userPic"] as? PFFile
+                        self.CellImage.loadInBackground() { image, error in
+                            if error == nil {
+                                self.CellImage.layer.borderColor = AppConfiguration.navText.CGColor
+                            }
+                        }
+                    } else {
+                        self.CellImage.image = UIImage(named: "ProfileIcon")
+                        self.CellImage.layer.borderColor = UIColor.clearColor().CGColor
+                    }
+                    if user["fullname"] != nil {
+                        self.userLabel.attributedText = NSMutableAttributedString(string: user["fullname"] as! String, attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
+                    } else {
+                        self.userLabel.attributedText = NSMutableAttributedString(string: "No Name", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
+                    }
+                    self.AgeLabel.attributedText = NSMutableAttributedString(string: "AGE: \(user.getAge())", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 27.0)!])
+                } else {
+                    if self.object["fullname"] != nil {
+                        self.userLabel.attributedText = NSMutableAttributedString(string: self.object["Name"] as! String, attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
+                    }
+                    if self.object["Age"] != nil {
+                        self.AgeLabel.hidden = false
+                        self.AgeLabel.attributedText = NSMutableAttributedString(string: self.object["Age"] as! String, attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 27.0)!])
+                    } else {
+                        self.AgeLabel.hidden = true
+                    }
+                    if self.object["userPic"] != nil {
+                        self.CellImage.file = self.object["userPic"] as? PFFile
+                        self.CellImage.loadInBackground() { image, error in
+                            if error == nil {
+                                self.CellImage.layer.borderColor = AppConfiguration.navText.CGColor
+                            }
+                        }
+                    }
+                }
+            })
         }
         if object["brushTime"] != nil {
             let mSec = (object["brushTime"] as! CGFloat)
             switch mSec {
             case 0...45:
-                BrushBadge.image = UIImage(named: "CavityMaker")!
+                type = .CavityMaker
             case 46...75:
-                BrushBadge.image = UIImage(named: "sugarbugs")!
+                type = .SugarBug
             case 76...105:
-                BrushBadge.image = UIImage(named: "ToothProtector")!
+                type = .ToothProtector
             default:
-                BrushBadge.image = UIImage(named: "ToothHero")!
+                type = .ToothHero
             }
             TimeLabel.attributedText = NSMutableAttributedString(string: mSec.toMinSec(), attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
         } else {
-            BrushBadge.image = nil
+            type = .CavityMaker
             TimeLabel.attributedText = NSMutableAttributedString(string: "00:00", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
         }
         if object["Flosser"] != nil {
-            let Floss = (object["Flosser"] as! Bool)
-            if Floss == true {
-                FlossBadge.image = UIImage(named: "flossicon")!
-            } else {
-                FlossBadge.image = nil
-            }
+            Floss = object["Flosser"] as! Bool
         } else {
-            FlossBadge.image = nil
+            Floss = false
         }
     }
-
+    
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -201,18 +274,8 @@ class SmilesViewController: UICollectionViewController, NavgationTransitionable 
         refreshControl.tintColor = UIColor.wheatColor()
         collectionView!.addSubview(refreshControl)
         refreshControl.addTarget(self, action:#selector(self.forceFetchData), forControlEvents:.ValueChanged)
-        
-        if UIScreen.mainScreen().bounds.size.height >= 736 {
-            self.view.frame = CGRect(x: 0, y: 44, width: 414, height: 643)
-        } else if UIScreen.mainScreen().bounds.size.height < 736 && UIScreen.mainScreen().bounds.size.height >= 667 {
-            self.view.frame = CGRect(x: 0, y: 44, width: 375, height: 574)
-        } else {
-            self.view.frame = CGRect(x: 0, y: 44, width: 320, height: 475)
-        }
-        
         self.forceFetchData()
     }
-    
     
     func getWeekDates() -> [NSDate] {
         var dates: [NSDate] = []
@@ -277,16 +340,22 @@ class SmilesViewController: UICollectionViewController, NavgationTransitionable 
     }
     
     
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         removeBack()
         addHamMenu()
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        sideMenuNavigationController = self.navigationController!
         if defaults.boolForKey("SugarBugStatus") == true {
             if PFUser.currentUser() != nil {
-                getMyProgress(PFUser.currentUser()!)
+                self.getMyProgress(PFUser.currentUser()!)
             }
             defaults.setBool(false, forKey: "SugarBugStatus")
         }
+        
         if PFUser.currentUser() != nil {
             weekDates = getWeekDates()
             for day in weekDates {
@@ -361,6 +430,7 @@ class SmilesViewController: UICollectionViewController, NavgationTransitionable 
         }
     }
     
+    
 }
 
 extension SmilesViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
@@ -386,7 +456,12 @@ extension SmilesViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     }
     
     func emptyDataSetDidTapButton(scrollView: UIScrollView!) {
-        switch tabController!.selectedIndex {
+        if sideMenuNavigationController!.viewControllers.contains(FriendsControl) {
+            sideMenuNavigationController!.tr_popToViewController(FriendsControl)
+        } else {
+            sideMenuNavigationController!.tr_pushViewController(FriendsControl, method: TRPushTransitionMethod.Fade)
+        }
+        /*switch tabController!.selectedIndex {
         case 0:
             if sideMenuNavigationController!.viewControllers.contains(FriendsControl) {
                 sideMenuNavigationController!.tr_popToViewController(FriendsControl)
@@ -407,7 +482,7 @@ extension SmilesViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
             }
         default:
             break
-        }
+        }*/
     }
     
     func spaceHeightForEmptyDataSet(scrollView: UIScrollView!) -> CGFloat {
@@ -435,8 +510,15 @@ extension SmilesViewController {
     
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell:SmilesCollectionViewCell = collectionView.dequeueReusableCellWithReuseIdentifier("smileCellReuse", forIndexPath: indexPath) as! SmilesCollectionViewCell
-        let object: PFObject = objectArray[indexPath.row]
-        cell.setObject(object)
+        cell.object = objectArray[indexPath.row]
+        return cell
+    }
+    
+    override func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+        guard let cell:SmilesCollectionViewCell = cell as? SmilesCollectionViewCell else {
+            return
+        }
+        cell.setupCell()
         if indexPath.row < colorsArray.count - 1 {
             cell.contentView.backgroundColor = UIColor.colorFromHexString(colorsArray[indexPath.row])
         } else {
@@ -449,14 +531,42 @@ extension SmilesViewController {
             }
             self.fetchData()
         }
-        return cell
     }
+    
+    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        guard let user: PFUser = objectArray[indexPath.row]["User"] as? PFUser else {
+            return
+        }
+        do {
+            try user.fetchIfNeeded()
+            let alertVC = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
+            let Profile = UIAlertAction(title: "View Sugar Bug Status", style: UIAlertActionStyle.Default) { (UIAlertAction) -> Void in
+                sideMenuNavigationController!.topViewController!.getMyProgress(user)
+            }
+            let Cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (UIAlertAction) -> Void in}
+            let Report = UIAlertAction(title: "Report \(user.Fullname())", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
+                self.showReportUser(user)
+            }
+            alertVC.addAction(Report)
+            alertVC.addAction(Profile)
+            alertVC.addAction(Cancel)
+            self.presentViewController(alertVC, animated: true, completion: nil)
+        } catch {
+            
+        }
+    }
+    
 }
 
 extension SmilesViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        return CGSizeMake(CGRectGetWidth(view.bounds), 120.0)
+        if screenBounds.size.height >= 736 {
+            return CGSizeMake(CGRectGetWidth(view.bounds), 120.0)
+        } else if screenBounds.size.height < 736 && screenBounds.size.height >= 667 {
+            return CGSizeMake(CGRectGetWidth(view.bounds), 100.0)
+        }
+        return CGSizeMake(CGRectGetWidth(view.bounds), 80.0)
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAtIndex section: NSInteger) -> CGFloat {

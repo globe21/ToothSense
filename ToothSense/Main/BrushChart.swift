@@ -29,7 +29,8 @@ class BrushChart : UIViewController, NavgationTransitionable {
     
     override func viewDidLoad() {
         addHamMenu()
-        removeBack()
+        addBackButton()
+        //removeBack()
         view.backgroundColor = AppConfiguration.backgroundColor
         self.navigationItem.title = "Brush Chart"
         

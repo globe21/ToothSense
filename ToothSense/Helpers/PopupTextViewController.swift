@@ -37,3 +37,27 @@ extension PopupTextViewController: UITextFieldDelegate {
         return true
     }
 }
+
+
+class PopupReportTextViewController: UIViewController {
+    
+    
+    @IBOutlet weak var reportTextView: UITextView!
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        reportTextView.layer.borderColor = AppConfiguration.navColor.CGColor
+        reportTextView.layer.borderWidth = 2.0
+        reportTextView.layer.cornerRadius = 3.0
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(endEditing)))
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    func endEditing() {
+        view.endEditing(true)
+    }
+}
+

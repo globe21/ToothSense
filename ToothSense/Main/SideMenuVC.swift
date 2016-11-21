@@ -206,8 +206,8 @@ extension SideMenuVC : EPPickerDelegate {
     }
     
     func epContactPicker(_: EPContactsPicker, didCancel error : NSError) {
-        
-        switch tabController!.selectedIndex {
+        sideMenuNavigationController!.tr_popViewController()
+        /*switch tabController!.selectedIndex {
         case 0:
             sideMenuNavigationController!.tr_popViewController()
         case 1:
@@ -216,7 +216,7 @@ extension SideMenuVC : EPPickerDelegate {
             sideMenuNavigationController3!.tr_popViewController()
         default:
             sideMenuNavigationController!.tr_popViewController()
-        }
+        }*/
     }
     
     func epContactPicker(_: EPContactsPicker, didSelectMultipleContacts contacts: [EPContact]) {
@@ -317,130 +317,35 @@ class SideMenuVC: UIViewController,KSideMenuVCDelegate, UITableViewDelegate, UIT
                     BuildController.profileImage = image!
                 }
             })
-            switch tabController!.selectedIndex {
-            case 0:
-                if sideMenuNavigationController!.viewControllers.contains(BuildController) {
-                    sideMenuNavigationController!.tr_popToViewController(BuildController)
-                } else {
-                    sideMenuNavigationController!.tr_pushViewController(BuildController, method: TRPushTransitionMethod.Fade)
-                }
-            case 1:
-                if sideMenuNavigationController2!.viewControllers.contains(BuildController) {
-                    sideMenuNavigationController2!.tr_popToViewController(BuildController)
-                } else {
-                    sideMenuNavigationController2!.tr_pushViewController(BuildController, method: TRPushTransitionMethod.Fade)
-                }
-            case 2:
-                if sideMenuNavigationController3!.viewControllers.contains(BuildController) {
-                    sideMenuNavigationController3!.tr_popToViewController(BuildController)
-                } else {
-                    sideMenuNavigationController3!.tr_pushViewController(BuildController, method: TRPushTransitionMethod.Fade)
-                }
-            default:
-                break
+            if sideMenuNavigationController!.viewControllers.contains(BuildController) {
+                sideMenuNavigationController!.tr_popToViewController(BuildController)
+            } else {
+                sideMenuNavigationController!.tr_pushViewController(BuildController, method: TRPushTransitionMethod.Fade)
             }
         } else if indexPath.row == 1 {
             sideMenuVC.closeMenu()
-            switch tabController!.selectedIndex {
-            case 0:
-                if sideMenuNavigationController!.viewControllers.contains(Smiles) {
-                    Smiles.getMyProgress(PFUser.currentUser()!)
-                    sideMenuNavigationController!.tr_popToViewController(Smiles)
-                } else {
-                    defaults.setBool(true, forKey: "SugarBugStatus")
-                    sideMenuNavigationController!.tr_pushViewController(Smiles, method: TRPushTransitionMethod.Fade)
-                }
-            case 1:
-                if sideMenuNavigationController2!.viewControllers.contains(Smiles) {
-                    Smiles.getMyProgress(PFUser.currentUser()!)
-                    sideMenuNavigationController2!.tr_popToViewController(Smiles)
-                } else {
-                    defaults.setBool(true, forKey: "SugarBugStatus")
-                    sideMenuNavigationController2!.tr_pushViewController(Smiles, method: TRPushTransitionMethod.Fade)
-                }
-            case 2:
-                if sideMenuNavigationController3!.viewControllers.contains(Smiles) {
-                    Smiles.getMyProgress(PFUser.currentUser()!)
-                    sideMenuNavigationController3!.tr_popToViewController(Smiles)
-                } else {
-                    defaults.setBool(true, forKey: "SugarBugStatus")
-                    sideMenuNavigationController3!.tr_pushViewController(Smiles, method: TRPushTransitionMethod.Fade)
-                }
-            default:
-                break
-            }
+            sideMenuNavigationController!.topViewController!.getMyProgress(PFUser.currentUser()!)
         } else if indexPath.row == 2 {
             sideMenuVC.closeMenu()
-            switch tabController!.selectedIndex {
-            case 0:
-                if sideMenuNavigationController!.viewControllers.contains(chartController) {
-                    sideMenuNavigationController!.tr_popToViewController(chartController)
-                } else {
-                    sideMenuNavigationController!.tr_pushViewController(chartController, method: TRPushTransitionMethod.Fade)
-                }
-            case 1:
-                if sideMenuNavigationController2!.viewControllers.contains(chartController) {
-                    sideMenuNavigationController2!.tr_popToViewController(chartController)
-                } else {
-                    sideMenuNavigationController2!.tr_pushViewController(chartController, method: TRPushTransitionMethod.Fade)
-                }
-            case 2:
-                if sideMenuNavigationController3!.viewControllers.contains(chartController) {
-                    sideMenuNavigationController3!.tr_popToViewController(chartController)
-                } else {
-                    sideMenuNavigationController3!.tr_pushViewController(chartController, method: TRPushTransitionMethod.Fade)
-                }
-            default:
-                break
+            if sideMenuNavigationController!.viewControllers.contains(chartController) {
+                sideMenuNavigationController!.tr_popToViewController(chartController)
+            } else {
+                sideMenuNavigationController!.tr_pushViewController(chartController, method: TRPushTransitionMethod.Fade)
             }
         } else if indexPath.row == 3 {
             sideMenuVC.closeMenu()
-            switch tabController!.selectedIndex {
-            case 0:
-                if sideMenuNavigationController!.viewControllers.contains(FriendsControl) {
-                    sideMenuNavigationController!.tr_popToViewController(FriendsControl)
-                } else {
-                    sideMenuNavigationController!.tr_pushViewController(FriendsControl, method: TRPushTransitionMethod.Fade)
-                }
-            case 1:
-                if sideMenuNavigationController2!.viewControllers.contains(FriendsControl) {
-                    sideMenuNavigationController2!.tr_popToViewController(FriendsControl)
-                } else {
-                    sideMenuNavigationController2!.tr_pushViewController(FriendsControl, method: TRPushTransitionMethod.Fade)
-                }
-            case 2:
-                if sideMenuNavigationController3!.viewControllers.contains(FriendsControl) {
-                    sideMenuNavigationController3!.tr_popToViewController(FriendsControl)
-                } else {
-                    sideMenuNavigationController3!.tr_pushViewController(FriendsControl, method: TRPushTransitionMethod.Fade)
-                }
-            default:
-                break
+            if sideMenuNavigationController!.viewControllers.contains(FriendsControl) {
+                sideMenuNavigationController!.tr_popToViewController(FriendsControl)
+            } else {
+                sideMenuNavigationController!.tr_pushViewController(FriendsControl, method: TRPushTransitionMethod.Fade)
             }
         } else if indexPath.row == 4 {
             sideMenuVC.closeMenu()
             contactPickerScene = EPContactsPicker(delegate: self, multiSelection:true, subtitleCellType: SubtitleCellValue.PhoneNumber)
-            switch tabController!.selectedIndex {
-            case 0:
-                if sideMenuNavigationController!.viewControllers.contains(contactPickerScene) {
-                    sideMenuNavigationController!.tr_popToViewController(contactPickerScene)
-                } else {
-                    sideMenuNavigationController!.tr_pushViewController(contactPickerScene, method: TRPushTransitionMethod.Fade)
-                }
-            case 1:
-                if sideMenuNavigationController2!.viewControllers.contains(contactPickerScene) {
-                    sideMenuNavigationController2!.tr_popToViewController(contactPickerScene)
-                } else {
-                    sideMenuNavigationController2!.tr_pushViewController(contactPickerScene, method: TRPushTransitionMethod.Fade)
-                }
-            case 2:
-                if sideMenuNavigationController3!.viewControllers.contains(contactPickerScene) {
-                    sideMenuNavigationController3!.tr_popToViewController(contactPickerScene)
-                } else {
-                    sideMenuNavigationController3!.tr_pushViewController(contactPickerScene, method: TRPushTransitionMethod.Fade)
-                }
-            default:
-                break
+            if sideMenuNavigationController!.viewControllers.contains(contactPickerScene) {
+                sideMenuNavigationController!.tr_popToViewController(contactPickerScene)
+            } else {
+                sideMenuNavigationController!.tr_pushViewController(contactPickerScene, method: TRPushTransitionMethod.Fade)
             }
         } else if indexPath.row == 5 {
             PFUser.logOut()
@@ -478,22 +383,23 @@ class kConstant {
         var viewControllers: [UIViewController] = [UIViewController]()
         let sideMenuObj = mainStoryboard.instantiateViewControllerWithIdentifier("sideMenuID")
         let mainVcObj = mainStoryboard.instantiateViewControllerWithIdentifier("SmilesViewController")
-        sideMenuNavigationController = UINavigationController(rootViewController: mainVcObj)
-        sideMenuNavigationController!.navigationBar.barTintColor = AppConfiguration.navColor
+        let sideMenuNavigationController1 = UINavigationController(rootViewController: mainVcObj)
+        sideMenuNavigationController1.navigationBar.barTintColor = AppConfiguration.navColor
         UINavigationBar.appearance().titleTextAttributes = AppConfiguration.textAttributes
-        sideMenuNavigationController!.extendedLayoutIncludesOpaqueBars = true
+        sideMenuNavigationController1.extendedLayoutIncludesOpaqueBars = true
         sideMenuVC.view.frame = UIScreen.mainScreen().bounds
-        viewControllers.append(sideMenuNavigationController!)
+        viewControllers.append(sideMenuNavigationController1)
+        sideMenuNavigationController = sideMenuNavigationController1
         let centerButton = mainStoryboard.instantiateViewControllerWithIdentifier("Brush")
-        sideMenuNavigationController2 = UINavigationController(rootViewController: centerButton)
-        sideMenuNavigationController2!.navigationBar.barTintColor = AppConfiguration.navColor
-        sideMenuNavigationController2!.extendedLayoutIncludesOpaqueBars = true
-        viewControllers.append(sideMenuNavigationController2!)
+        let sideMenuNavigationController2 = UINavigationController(rootViewController: centerButton)
+        sideMenuNavigationController2.navigationBar.barTintColor = AppConfiguration.navColor
+        sideMenuNavigationController2.extendedLayoutIncludesOpaqueBars = true
+        viewControllers.append(sideMenuNavigationController2)
         let sideMenuObj2 = mainStoryboard.instantiateViewControllerWithIdentifier("VideoTable")
-        sideMenuNavigationController3 = UINavigationController(rootViewController: sideMenuObj2)
-        sideMenuNavigationController3!.navigationBar.barTintColor = AppConfiguration.navColor
-        sideMenuNavigationController3!.extendedLayoutIncludesOpaqueBars = true
-        viewControllers.append(sideMenuNavigationController3!)
+        let sideMenuNavigationController3 = UINavigationController(rootViewController: sideMenuObj2)
+        sideMenuNavigationController3.navigationBar.barTintColor = AppConfiguration.navColor
+        sideMenuNavigationController3.extendedLayoutIncludesOpaqueBars = true
+        viewControllers.append(sideMenuNavigationController3)
         tabController = RAMAnimatedTabBarController(viewControllers: viewControllers)
         tabController!.tabBar.barTintColor = AppConfiguration.navColor
         sideMenuVC.setupMainViewController(tabController!)

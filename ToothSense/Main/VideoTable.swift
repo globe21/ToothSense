@@ -13,8 +13,32 @@ import AVKit
 import AVFoundation
 
 
-class VideoTable: UIViewController, UITableViewDataSource, UITableViewDelegate, NavgationTransitionable {
+extension UIImageView {
+    func generateThumbImage(url: NSURL, time: CMTime, view: UIView) {
+        let asset = AVAsset(URL: url)
+        let imageGenerator = AVAssetImageGenerator(asset: asset)
+        imageGenerator.appliesPreferredTrackTransform = true
+        //var time = asset.duration
+        //time.value = time.value < 2 ? time.value : 2
+        imageGenerator.generateCGImagesAsynchronouslyForTimes([NSValue(CMTime: time)]) { (_, image, _, result, error) in
+            if error == nil && image != nil {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.image = UIImage(CGImage: image!)
+                    /*self.contentMode = .ScaleAspectFit
+                     self.backgroundColor = UIColor.clearColor()
+                     self.frame = CGRect(x: 2.5, y: 2.5, width: view.frame.width - 5, height: (view.frame.width * (8/15)) - 5)
+                     view.addSubview(self)*/
+                    //self.setNeedsDisplay()
+                }
+            }
+        }
+    }
+}
 
+class VideoTable: UIViewController, UITableViewDataSource, UITableViewDelegate, NavgationTransitionable {
+    
+    
+    
     @IBOutlet var VideoTableTabAnimation: RAMFumeAnimation!
     
     var tr_pushTransition: TRNavgationTransitionDelegate?
@@ -25,9 +49,9 @@ class VideoTable: UIViewController, UITableViewDataSource, UITableViewDelegate, 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationItem.title = "Videos"
         view.backgroundColor = AppConfiguration.backgroundColor
         tableView.backgroundColor = AppConfiguration.backgroundColor
-        self.navigationItem.title = "Videos"
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(self.updateOrientationAnimated(_:)), name: UIDeviceOrientationDidChangeNotification, object: nil)
         UIDevice.currentDevice().beginGeneratingDeviceOrientationNotifications()
         tableView.registerClass(VideoCell.self, forCellReuseIdentifier: "VideoCell")
@@ -47,10 +71,12 @@ class VideoTable: UIViewController, UITableViewDataSource, UITableViewDelegate, 
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
+        sideMenuNavigationController = self.navigationController!
     }
     
     override func viewWillDisappear(animated : Bool) {
         super.viewWillDisappear(animated)
+        //self.navigationController!.tr_popToRootViewController()
         if playingVideo != nil {
             playingVideo!.playerController.player!.pause()
         }
@@ -64,10 +90,34 @@ class VideoTable: UIViewController, UITableViewDataSource, UITableViewDelegate, 
     
     // MARK: - <UITableViewDataSource>
     
+    
+    /*func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+     guard let cell: VideoCell = cell as? VideoCell else {
+     return
+     }
+     if cell.loaded == false {
+     cell.setupImageView()//setupResource(indexPath)
+     }
+     }*/
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath:NSIndexPath) -> UITableViewCell {
         let resource = mediaNames[indexPath.row]
+        //let cell: VideoCell = VideoCell(style: UITableViewCellStyle.Default, reuseIdentifier: "VideoCell")
         let cell: VideoCell = tableView.dequeueReusableCellWithIdentifier("VideoCell", forIndexPath: indexPath) as! VideoCell
-        cell.settingResource(resource, viewController: self)
+        cell.viewController = self
+        cell.placeHolderImage.image = nil
+        guard let path: String = NSBundle.mainBundle().pathForResource(resource, ofType:"mp4") else {
+            guard let path2: String = NSBundle.mainBundle().pathForResource(resource, ofType:"mov") else {
+                return cell
+            }
+            cell.resource = NSURL.init(fileURLWithPath: path2)
+            cell.resourceName = resource
+            cell.setupResource()
+            return cell
+        }
+        cell.resource = NSURL.init(fileURLWithPath: path)
+        cell.resourceName = resource
+        cell.setupResource()
         //cell.delegate = cell//self
         return cell
     }
@@ -93,7 +143,6 @@ class VideoTable: UIViewController, UITableViewDataSource, UITableViewDelegate, 
             return
         }
         if playingVideo != nil {
-            
             switch (UIDevice.currentDevice().orientation) {
             case UIDeviceOrientation.LandscapeRight:
                 playingVideo!.playerController.view.cheetah.duration(0.1).rotate(-M_PI_2).scale(1.8).run()
@@ -359,13 +408,36 @@ public class VideoCell: UITableViewCell {
     
     var userVideoFile: PFFile!
     
+    var loaded: Bool = false
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: UITableViewCellStyle.Default, reuseIdentifier: "VideoCell")
+        contentView.backgroundColor = AppConfiguration.backgroundColor
         delegate = self
     }
     
-    func settingResource(resource: String, viewController: UIViewController) {
+    var resource: NSURL!
+    var viewController: UIViewController!
+    
+    var resourceName: String = ""
+    
+    var placeHolderImage: UIImageView = UIImageView()
+    
+    
+    func setupImageView() {
+        //var time : CMTime = CMTime(seconds: 1.0, preferredTimescale: 1)
+        switch self.resourceName {
+        case "toby": self.placeHolderImage.image = UIImage(named: "SugarBugScreenShot")!//time = CMTime(seconds: 1.5, preferredTimescale: 10)
+        case "babyteeth": self.placeHolderImage.image = UIImage(named: "babyteethScreenShot")!//time = CMTime(seconds: 1.5, preferredTimescale: 10)
+        case "babypart1": self.placeHolderImage.image = UIImage(named: "part1ScreenShot")!//time = CMTime(seconds: 1.81, preferredTimescale: 100)
+        case "babypart2": self.placeHolderImage.image = UIImage(named: "part2ScreenShot")!//time = CMTime(seconds: 4.0, preferredTimescale: 100)
+        case "babypart3": self.placeHolderImage.image = UIImage(named: "part3ScreenShot")!//time = CMTime(seconds: 0.0, preferredTimescale: 10)
+        default: self.placeHolderImage.image = UIImage(named: "part3ScreenShot")!//time = CMTime(seconds: 0.0, preferredTimescale: 1)
+        }
+        //self.placeHolderImage.generateThumbImage(self.resource, time: time, view: self.visualEffectView)
+    }
+    
+    func setupResource() {
         let width = screenBounds.width
         controller = viewController
         visualEffectView = VisualEffectView(frame: CGRect(x: 0, y: 0, width: width, height: width * (8/15)))
@@ -374,6 +446,7 @@ public class VideoCell: UITableViewCell {
         visualEffectView.blurRadius = 10
         visualEffectView.scale = 1
         contentView.addSubview(visualEffectView)
+        
         progressView = NPProgressLabel(frame: CGRect(x: 0, y: visualEffectView.frame.midY - 40, width: width, height: 80))
         progressView.text = "Loading"
         progressView.fontName = "AmericanTypewriter"
@@ -392,7 +465,40 @@ public class VideoCell: UITableViewCell {
         progressView.layer.addAnimation(moveRight, forKey: nil)
         moveRight.beginTime = CACurrentMediaTime() + 0.2
         contentView.layer.addAnimation(moveRight, forKey: nil)
-        createVideo(resource)
+        
+        self.playerItem = AVPlayerItem.init(URL: self.resource)
+        self.player = AVPlayer(playerItem: self.playerItem!)
+        self.playerController.addObserver(self, forKeyPath: PlayerReadyForDisplayKey, options: ([NSKeyValueObservingOptions.New, NSKeyValueObservingOptions.Old]), context: &PlayerLayerObserverContext)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:#selector(self.itemDidFinishPlaying), name:AVPlayerItemDidPlayToEndTimeNotification, object:self.playerItem)
+        backgroundColor = AppConfiguration.navColor
+        playerController.view.frame = CGRect(x: 2.5, y: 2.5, width: visualEffectView.frame.width - 5, height: (visualEffectView.frame.width * (8/15)) - 5)
+        playerController.view.backgroundColor = .clearColor()
+        playerController.showsPlaybackControls = false
+        controller.addChildViewController(playerController)
+        visualEffectView.addSubview(playerController.view)
+        
+        self.progressView.setProgress(1.0, animated: true)
+        
+        self.placeHolderImage.contentMode = .ScaleAspectFit
+        self.placeHolderImage.backgroundColor = UIColor.clearColor()
+        self.placeHolderImage.frame = CGRect(x: 2.5, y: 2.5, width: visualEffectView.frame.width - 5, height: (visualEffectView.frame.width * (8/15)) - 5)
+        self.visualEffectView.addSubview(self.placeHolderImage)
+        
+        self.progressView.cheetah.scale(1.3).duration(1.0).wait().move(screenBounds.width, 0).duration(0.5).run().completion({
+            self.progressView.removeFromSuperview()
+            self.playerController.view.cheetah.alpha(1.0).duration(0.3).run()
+            self.PlayButton.cheetah.alpha(0.9).duration(0.5).delay(0.4).run()
+            self.loaded = true
+            self.setupImageView()
+            //, time: CMTime)
+        })
+        
+        
+        /*self.placeHolderImage.frame = CGRect(x: 2.5, y: 2.5, width: visualEffectView.frame.width - 5, height: (visualEffectView.frame.width * (8/15)) - 5)
+         self.placeHolderImage.contentMode = .ScaleAspectFit
+         self.placeHolderImage.backgroundColor = UIColor.clearColor()
+         self.visualEffectView.addSubview(self.placeHolderImage)*/
+        
         PlayButton.setImage(playimage, forState: .Normal)
         PlayButton.frame = playerController.view.frame
         PlayButton.backgroundColor = UIColor.clearColor()
@@ -413,7 +519,9 @@ public class VideoCell: UITableViewCell {
             view1.left   == view2.left + 30
             view1.bottom  == view2.bottom - 10
         }
+        
         visualEffectView.addSubview(progressView)
+        
         miniButton.setImage(UIImage(named: "minimize")!, forState: .Normal)
         miniButton.frame = CGRect(x: screenBounds.width, y: 10, width: 50, height: 50)
         miniButton.backgroundColor = UIColor.clearColor()
@@ -421,56 +529,17 @@ public class VideoCell: UITableViewCell {
         miniButton.addTarget(self, action: #selector(self.tappedMini), forControlEvents: .TouchUpInside)
         visualEffectView.addSubview(miniButton)
         contentView.removeLoaderView()
+        
     }
     
-    func createVideo(resource: String) {
-        guard let path: String = NSBundle.mainBundle().pathForResource(resource, ofType:"mp4") else {
-            guard let path2: String = NSBundle.mainBundle().pathForResource(resource, ofType:"mov") else {
-                return
-            }
-            let url = NSURL.init(fileURLWithPath: path2)
-            self.playerItem = AVPlayerItem.init(URL: url)
-            self.player = AVPlayer(playerItem: self.playerItem!)
-            self.playerController.addObserver(self, forKeyPath: PlayerReadyForDisplayKey, options: ([NSKeyValueObservingOptions.New, NSKeyValueObservingOptions.Old]), context: &PlayerLayerObserverContext)
-            NSNotificationCenter.defaultCenter().addObserver(self, selector:#selector(self.itemDidFinishPlaying), name:AVPlayerItemDidPlayToEndTimeNotification, object:self.playerItem)
-            backgroundColor = AppConfiguration.navColor
-            playerController.view.frame = CGRect(x: 2.5, y: 2.5, width: visualEffectView.frame.width - 5, height: (visualEffectView.frame.width * (8/15)) - 5)
-            playerController.view.backgroundColor = .clearColor()
-            playerController.showsPlaybackControls = false
-            controller.addChildViewController(playerController)
-            visualEffectView.addSubview(playerController.view)
-            self.progressView.setProgress(1.0, animated: true)
-            self.progressView.cheetah.scale(1.3).duration(1.0).wait().move(screenBounds.width, 0).duration(0.5).run().completion({
-                self.progressView.removeFromSuperview()
-                self.playerController.view.cheetah.alpha(1.0).duration(0.3).run()
-                self.PlayButton.cheetah.alpha(0.9).duration(0.5).delay(0.4).run()
-            })
-            return
-        }
-        let url = NSURL.init(fileURLWithPath: path)
-        self.playerItem = AVPlayerItem.init(URL: url)
-        self.player = AVPlayer(playerItem: self.playerItem!)
-        self.playerController.addObserver(self, forKeyPath: PlayerReadyForDisplayKey, options: ([NSKeyValueObservingOptions.New, NSKeyValueObservingOptions.Old]), context: &PlayerLayerObserverContext)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:#selector(self.itemDidFinishPlaying), name:AVPlayerItemDidPlayToEndTimeNotification, object:self.playerItem)
-        backgroundColor = AppConfiguration.navColor
-        playerController.view.frame = CGRect(x: 2.5, y: 2.5, width: visualEffectView.frame.width - 5, height: (visualEffectView.frame.width * (8/15)) - 5)
-        playerController.view.backgroundColor = .clearColor()
-        playerController.showsPlaybackControls = false
-        controller.addChildViewController(playerController)
-        visualEffectView.addSubview(playerController.view)
-        self.progressView.setProgress(1.0, animated: true)
-        self.progressView.cheetah.scale(1.3).duration(1.0).wait().move(screenBounds.width, 0).duration(0.5).run().completion({
-            self.progressView.removeFromSuperview()
-            self.playerController.view.cheetah.alpha(1.0).duration(0.3).run()
-            self.PlayButton.cheetah.alpha(0.9).duration(0.5).delay(0.4).run()
-        })
-    }
+    
     
     // MARK: - functions
     
     public func resetVideo() {
         self.resetButton.cheetah.alpha(0.0).duration(0.2).run().completion {
             self.resetButton.enabled = false
+            self.placeHolderImage.hidden = false
         }
         self.player.seekToTime(kCMTimeZero)
     }
@@ -551,7 +620,8 @@ public class VideoCell: UITableViewCell {
             self.PlayButton.transform = CGAffineTransformIdentity
         }).run()
         self.miniButton.cheetah.move(60,0).duration(0.6).easeInOutBounce.run()
-        switch tabController!.selectedIndex {
+        sideMenuNavigationController!.setNavigationBarHidden(false, animated: true)
+        /*switch tabController!.selectedIndex {
         case 0:
             sideMenuNavigationController!.setNavigationBarHidden(false, animated: true)
         case 1:
@@ -560,11 +630,12 @@ public class VideoCell: UITableViewCell {
             sideMenuNavigationController3!.setNavigationBarHidden(false, animated: true)
         default:
             break
-        }
+        }*/
         tabController!.setTabBarVisible(true, animated: true)
     }
     
     public func tappedPlay() {
+        self.placeHolderImage.hidden = true
         if self.playbackState != .Playing {
             if playingVideo != nil && playingVideo != self {
                 playingVideo!.pause()
@@ -578,7 +649,8 @@ public class VideoCell: UITableViewCell {
             UIView.animateWithDuration(0.6, delay: 0.0, options: UIViewAnimationOptions.CurveEaseInOut, animations: {
                 self.visualEffectView.frame = screenBounds
                 self.miniButton.frame = self.miniButton.frame.offsetBy(dx: -60, dy: 0)
-                switch tabController!.selectedIndex {
+                sideMenuNavigationController!.setNavigationBarHidden(true, animated: true)
+                /*switch tabController!.selectedIndex {
                 case 0:
                     sideMenuNavigationController!.setNavigationBarHidden(true, animated: true)
                 case 1:
@@ -587,7 +659,7 @@ public class VideoCell: UITableViewCell {
                     sideMenuNavigationController3!.setNavigationBarHidden(true, animated: true)
                 default:
                     break
-                }
+                }*/
                 tabController!.setTabBarVisible(false, animated: true)
                 }, completion: nil)
             
@@ -646,7 +718,7 @@ extension VideoCell {
         case (.Some(PlayerKeepUpKey), &PlayerItemObserverContext):
             if let item = self.playerItem {
                 self.bufferingState = .Ready
-                
+                //self.placeHolderImage.generateThumbImage(self.resource)
                 if item.playbackLikelyToKeepUp && self.playbackState == .Playing {
                     self.playFromCurrentTime()
                 }
