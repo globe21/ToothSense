@@ -53,9 +53,8 @@ class BuildViewController : FormViewController, NavgationTransitionable {
     var PMChanged: Bool = false
     
     override func viewWillAppear(animated: Bool) {
-        //removeBack()
+        removeBack()
         addHamMenu()
-        addBackButton()
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -196,13 +195,8 @@ class BuildViewController : FormViewController, NavgationTransitionable {
                         AMRow.updateCell()
                         PMRow.value = NSDate().change(nil, month: nil, day: nil, hour: 18, minute: 0, second: 0)
                         PMRow.updateCell()
-                        if #available(iOS 10.0, *) {
-                            Notifycenter.removeAllPendingNotificationRequests()
-                            Notifycenter.removeAllDeliveredNotifications()
-                        } else {
-                            UIApplication.sharedApplication().cancelLocalNotification(AMNotification)
-                            UIApplication.sharedApplication().cancelLocalNotification(PMNotification)
-                        }
+                        UIApplication.sharedApplication().cancelLocalNotification(AMNotification)
+                        UIApplication.sharedApplication().cancelLocalNotification(PMNotification)
                         defaults.setValue(nil, forKey: "AMReminder")
                         defaults.setValue(nil, forKey: "PMReminder")
                     })
@@ -364,13 +358,8 @@ class BuildViewController : FormViewController, NavgationTransitionable {
                         AMRow.updateCell()
                         PMRow.value = NSDate().change(nil, month: nil, day: nil, hour: 18, minute: 0, second: 0)
                         PMRow.updateCell()
-                        if #available(iOS 10.0, *) {
-                            Notifycenter.removeAllPendingNotificationRequests()
-                            Notifycenter.removeAllDeliveredNotifications()
-                        } else {
-                            UIApplication.sharedApplication().cancelLocalNotification(AMNotification)
-                            UIApplication.sharedApplication().cancelLocalNotification(PMNotification)
-                        }
+                        UIApplication.sharedApplication().cancelLocalNotification(AMNotification)
+                        UIApplication.sharedApplication().cancelLocalNotification(PMNotification)
                         defaults.setValue(nil, forKey: "AMReminder")
                         defaults.setValue(nil, forKey: "PMReminder")
                     })
@@ -533,13 +522,8 @@ class BuildViewController : FormViewController, NavgationTransitionable {
                         AMRow.updateCell()
                         PMRow.value = NSDate().change(nil, month: nil, day: nil, hour: 18, minute: 0, second: 0)
                         PMRow.updateCell()
-                        if #available(iOS 10.0, *) {
-                            Notifycenter.removeAllPendingNotificationRequests()
-                            Notifycenter.removeAllDeliveredNotifications()
-                        } else {
-                            UIApplication.sharedApplication().cancelLocalNotification(AMNotification)
-                            UIApplication.sharedApplication().cancelLocalNotification(PMNotification)
-                        }
+                        UIApplication.sharedApplication().cancelLocalNotification(AMNotification)
+                        UIApplication.sharedApplication().cancelLocalNotification(PMNotification)
                         defaults.setValue(nil, forKey: "AMReminder")
                         defaults.setValue(nil, forKey: "PMReminder")
                     })
@@ -608,58 +592,22 @@ class BuildViewController : FormViewController, NavgationTransitionable {
         let dateComponents: NSDateComponents = NSDateComponents()
         dateComponents.hour = hour
         dateComponents.minute = Min
-        if #available(iOS 10.0, *) {
-            let trigger: UNCalendarNotificationTrigger = UNCalendarNotificationTrigger(dateMatchingComponents: dateComponents, repeats: true)
-            let path: String = NSBundle.mainBundle().pathForResource("timer_6", ofType:"mp4")!
-            let fileURL = NSURL.init(fileURLWithPath: path)
-            let content: UNMutableNotificationContent = UNMutableNotificationContent()
-            content.title = "Hey \(PFUser.currentUser()!["fullname"] as! String)!"
-            content.sound = UNNotificationSound.defaultSound()
-            do {
-                let attachment = try UNNotificationAttachment(identifier: "image", URL: fileURL, options: nil)
-                content.attachments = [ attachment ]
-            } catch {
-                
-            }
-            /// 4. update application icon badge number
-            let badgeNum = UIApplication.sharedApplication().applicationIconBadgeNumber + 1
-            content.badge = NSNumber(integerLiteral: badgeNum)
-            var request: UNNotificationRequest!
-            if AM == true {
-                Notifycenter.removeDeliveredNotificationsWithIdentifiers(["AMAlarm"])
-                Notifycenter.removePendingNotificationRequestsWithIdentifiers(["AMAlarm"])
-                content.body = "Don't forget to brush this morning.."
-                request = UNNotificationRequest(identifier: "AMAlarm", content: content, trigger: trigger)
-            } else {
-                Notifycenter.removeDeliveredNotificationsWithIdentifiers(["PMAlarm"])
-                Notifycenter.removePendingNotificationRequestsWithIdentifiers(["PMAlarm"])
-                content.body = "Don't forget to brush before Bed!"
-                request = UNNotificationRequest(identifier: "PMAlarm", content: content, trigger: trigger)
-            }
-            //Notifycenter.removeAllDeliveredNotifications()
-            Notifycenter.addNotificationRequest(request) { (error) in
-                if (error == nil) {
-                    print("Created Alarm")//: \(dateComponents.date!))")
-                }
-            }
+        if AM == true {
+            UIApplication.sharedApplication().cancelLocalNotification(AMNotification)
+            AMNotification.fireDate = NSDate().change(nil, month: nil, day: nil, hour: hour, minute: Min, second: nil)
+            AMNotification.alertBody = "Hey \(PFUser.currentUser()!.fullname)!"
+            AMNotification.alertAction = "Don't forget to brush this morning.."
+            AMNotification.soundName = UILocalNotificationDefaultSoundName
+            AMNotification.repeatInterval = .Day
+            UIApplication.sharedApplication().scheduleLocalNotification(AMNotification)
         } else {
-            if AM == true {
-                UIApplication.sharedApplication().cancelLocalNotification(AMNotification)
-                AMNotification.fireDate = NSDate().change(nil, month: nil, day: nil, hour: hour, minute: Min, second: nil)
-                AMNotification.alertBody = "Hey \(PFUser.currentUser()!["fullname"] as! String)!"
-                AMNotification.alertAction = "Don't forget to brush this morning.."
-                AMNotification.soundName = UILocalNotificationDefaultSoundName
-                AMNotification.repeatInterval = .Day
-                UIApplication.sharedApplication().scheduleLocalNotification(AMNotification)
-            } else {
-                UIApplication.sharedApplication().cancelLocalNotification(PMNotification)
-                PMNotification.fireDate = NSDate().change(nil, month: nil, day: nil, hour: hour, minute: Min, second: nil)
-                PMNotification.alertBody = "Hey \(PFUser.currentUser()!["fullname"] as! String)!"
-                PMNotification.alertAction = "Don't forget to brush before Bed!"
-                PMNotification.soundName = UILocalNotificationDefaultSoundName
-                PMNotification.repeatInterval = .Day
-                UIApplication.sharedApplication().scheduleLocalNotification(PMNotification)
-            }
+            UIApplication.sharedApplication().cancelLocalNotification(PMNotification)
+            PMNotification.fireDate = NSDate().change(nil, month: nil, day: nil, hour: hour, minute: Min, second: nil)
+            PMNotification.alertBody = "Hey \(PFUser.currentUser()!.fullname)!"
+            PMNotification.alertAction = "Don't forget to brush before Bed!"
+            PMNotification.soundName = UILocalNotificationDefaultSoundName
+            PMNotification.repeatInterval = .Day
+            UIApplication.sharedApplication().scheduleLocalNotification(PMNotification)
         }
     }
 }

@@ -188,7 +188,8 @@ public class VideoCell: UITableViewCell {
         let duration: NSTimeInterval = 0.3
         let damping: CGFloat = 0.55
         let degrees = CGFloat(sin(90.0 * M_PI/180.0))
-        self.layer.setAffineTransform(CGAffineTransformMakeRotation(degrees))//CGAffineTransformMakeScale(-1,-1))
+        self.layer.setAffineTransform(CGAffineTransformMakeRotation(degrees))
+        //self.layer.setAffineTransform(CGAffineTransformConcat(CGAffineTransformMakeRotation(degrees),CGAffineTransformMakeScale(-1,-1)))
         UIView.animateWithDuration(duration, delay: self.delay, usingSpringWithDamping: damping, initialSpringVelocity: 0.0, options: .CurveEaseInOut, animations: {
             self.visualEffectView.frame = self.visualEffectView.frame.offsetBy(dx: self.width, dy: 0)
             self.layer.setAffineTransform(CGAffineTransformIdentity)
@@ -399,7 +400,8 @@ public class VideoCell: UITableViewCell {
                 self.resetButton.enabled = true
             })
         }
-        self.visualEffectView.cheetah.frame(self.controller.view.convertRect(self.contentView.frame, fromView: self.contentView)).duration(0.4).easeInOutBounce.completion({
+        let rectFrame = self.controller.tableView.convertRect(self.contentView.frame, fromView: self.contentView)
+        self.visualEffectView.cheetah.frame(rectFrame).duration(0.4).completion({
             self.contentView.addSubview(self.visualEffectView)
             self.visualEffectView.frame = self.contentView.frame
             self.playerController.view.transform = CGAffineTransformIdentity
@@ -408,6 +410,7 @@ public class VideoCell: UITableViewCell {
             sideMenuNavigationController!.setNavigationBarHidden(false, animated: true)
             tabController!.setTabBarVisible(true, animated: true)
         }).run()
+
     }
     
     public func tappedPlay() {
@@ -420,12 +423,12 @@ public class VideoCell: UITableViewCell {
                 mainWindow.addSubview(self.visualEffectView)
                 self.visualEffectView.frame = mainWindow.convertRect(self.visualEffectView.frame, fromView: self.contentView)
                 }, completion: {_ in
-                UIView.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                UIView.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
                     self.visualEffectView.frame = CGRect(x: 0, y: mainWindow.frame.midY - (self.height/2), width: self.width, height: self.height)
                     }, completion: {_ in
-                        UIView.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveEaseOut, animations: {
+                        self.PlayButton.cheetah.alpha(0.0).duration(0.1).run()
+                        UIView.animateWithDuration(0.4, delay: 0.0, options: UIViewAnimationOptions.CurveLinear, animations: {
                             self.visualEffectView.frame = mainWindow.frame
-                            self.PlayButton.alpha = 0.0
                             self.resetButton.alpha = 0.0
                             self.placeHolderImage.hidden = true
                             }, completion: {_ in

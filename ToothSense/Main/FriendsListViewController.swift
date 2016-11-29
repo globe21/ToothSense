@@ -18,11 +18,6 @@ var Followers: [PFUser] = [PFUser]()
 var Following: [PFUser] = [PFUser]()
 var SearchFollowers: [PFUser] = [PFUser]()
 
-
-public protocol FriendCellDelegate: class {
-    func friendCellDidLoad(cell: FollowCell)
-}
-
 class FriendListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, ScrollPagerDelegate, DZNEmptyDataSetDelegate, DZNEmptyDataSetSource, UISearchBarDelegate, NavgationTransitionable {
     
     var tr_pushTransition: TRNavgationTransitionDelegate?
@@ -46,9 +41,8 @@ class FriendListViewController: UIViewController, UITableViewDataSource, UITable
     
     var cellHeight: CGFloat = 80.0
     
-    
     // MARK: - ScrollPagerDelegate -
-
+    
     func scrollPager(scrollPager: ScrollPager, changedIndex: Int) {
         appeared = true
         switch changedIndex {
@@ -217,8 +211,7 @@ class FriendListViewController: UIViewController, UITableViewDataSource, UITable
     
     override func viewWillAppear(animated: Bool) {
         addHamMenu()
-        addBackButton()
-        //removeBack()
+        removeBack()
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -227,13 +220,12 @@ class FriendListViewController: UIViewController, UITableViewDataSource, UITable
     }
     
     override func viewDidLoad() {
-        self.navigationItem.title = "Friends"
+        self.title = "Friends"
         self.friendSelect.delegate = self
         refreshController.tintColor = AppConfiguration.navText
         tableView.addSubview(refreshController)
         refreshController.addTarget(self, action:#selector(self.forceFetchData), forControlEvents:.ValueChanged)
         self.forceFetchData()
-        
         if UIScreen.mainScreen().bounds.size.height >= 736 {
             self.view.frame = CGRect(x: 0, y: 44, width: 414, height: 643)
         } else if UIScreen.mainScreen().bounds.size.height < 736 && UIScreen.mainScreen().bounds.size.height >= 667 {
@@ -257,7 +249,7 @@ class FriendListViewController: UIViewController, UITableViewDataSource, UITable
         }
         return NSAttributedString(string: "No Followers", attributes: attributes)
     }
-
+    
     
     func spaceHeightForEmptyDataSet(scrollView: UIScrollView!) -> CGFloat {
         return scrollView.bounds.height * 0.05
@@ -294,7 +286,6 @@ class FriendListViewController: UIViewController, UITableViewDataSource, UITable
     }
     
     func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-        //cell.setupBadge("1")
         if cell is FollowCell {
             let cell = cell as! FollowCell
             cell.FollowerPic.center.y = cell.contentView.center.y
@@ -318,27 +309,8 @@ class FriendListViewController: UIViewController, UITableViewDataSource, UITable
         }
     }
     
-    /*
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let swipeCell: FollowCell = (tableView.cellForRowAtIndexPath(indexPath) as? FollowCell)!
-        swipeCell.showSwipe(MGSwipeDirection.RightToLeft, animated: true) { (success: Bool) in
-            //
-        }
-    }
-    */
-    
-    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let swipeCell: FollowCell = (tableView.dequeueReusableCellWithIdentifier("FollowCell") as? FollowCell)!
-       /* let block: UIImage = UIImage(named:"minusicon")!
-        let delete: MGSwipeButton = MGSwipeButton(title: "", icon: block, backgroundColor: UIColor.crimsonColor(), insets: UIEdgeInsets(top: 5,left: 5,bottom: 5,right: 5), callback: { (sender: MGSwipeTableCell!) -> Bool in
-            
-            return true
-        })
-        delete.buttonWidth = block.size.width * (cellHeight/block.size.height)
-        delete.iconTintColor(AppConfiguration.navText)
-        swipeCell.rightButtons = [delete]
-        swipeCell.rightSwipeSettings.transition = MGSwipeTransition.Drag*/
         if self.searchActive == true {
             swipeCell.Follower = SearchFollowers[indexPath.row]
         } else {
@@ -380,9 +352,30 @@ public class FollowCell : UITableViewCell {
     var Follower: PFUser? {
         didSet {
             Follower!.settingUpCell(self)
+            self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.showOptions)))
         }
     }
     
+    func showOptions() {
+        guard let user = Follower else { return }
+        do {
+            try user.fetchIfNeeded()
+            let alertVC = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
+            let Profile = UIAlertAction(title: "View Sugar Bug Status", style: UIAlertActionStyle.Default) { (UIAlertAction) -> Void in
+                sideMenuNavigationController!.topViewController!.getMyProgress(user)
+            }
+            let Cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (UIAlertAction) -> Void in}
+            let Report = UIAlertAction(title: "Report \(user.fullname)", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
+                self.showReportUser(user)
+            }
+            alertVC.addAction(Report)
+            alertVC.addAction(Profile)
+            alertVC.addAction(Cancel)
+            self.getParentViewController()!.presentViewController(alertVC, animated: true, completion: nil)
+        } catch {
+            
+        }
+    }
     
     func showReportUser(user: PFUser) {
         let popVC = PopupReportTextViewController(nibName: "PopupReportTextViewController", bundle: nil)
@@ -456,16 +449,6 @@ public class FollowCell : UITableViewCell {
         query.findObjectsInBackgroundWithBlock{
             objects, error in
             if error == nil {
-                /*let myfollowers = (PFUser.currentUser()?["Followers"] as? Int)!
-                let otherfollowers = (otherUser["Followers"] as? Int)!
-                if myfollowers >= 1 {
-                    PFUser.currentUser()?.incrementKey("Following", byAmount: -1)
-                    PFUser.currentUser()?.saveInBackground()
-                }
-                if otherfollowers >= 1 {
-                    otherUser.incrementKey("Followers", byAmount: -1)
-                    otherUser.saveInBackground()
-                }*/
                 for object in objects! {
                     object["Active"] = false
                     object["Accepted"] = false
@@ -491,36 +474,13 @@ public class FollowCell : UITableViewCell {
                     friend.setObject(false, forKey: "Accepted")
                     friend.saveInBackground()
                     self.addToFriends(otherUser)
-                    //if PFUser.currentUser()
-                    Followers.append(otherUser)//friend)
-                    let push = PFPush()
-                    let data = [
-                        "alert" : "\((PFUser.currentUser()?["fullname"])! as! String) wants to follow you.",
-                        "badge" : "Increment",
-                        "ObjID" : (PFUser.currentUser()?.objectId!)! as String,
-                        "type" : "sendFollow"]
-                    let installQuery = PFInstallation.query()
-                    installQuery?.whereKey("User", equalTo: otherUser)
-                    push.setQuery(installQuery)
-                    push.setData(data)
-                    push.sendPushInBackground()
+                    Followers.append(otherUser)
                 } else if objects!.count == 1 {
                     let object = objects?.first
                     object!["Active"] = true
                     object!["Accepted"] = true
                     object!.saveInBackground()
                     self.addToFriends(otherUser)
-                    let push = PFPush()
-                    let data = [
-                        "alert" : "\((PFUser.currentUser()?["fullname"])! as! String) wants to follow you.",
-                        "badge" : "Increment",
-                        "ObjID" : (PFUser.currentUser()?.objectId!)! as String,
-                        "type" : "sendFollow"]
-                    let installQuery = PFInstallation.query()
-                    installQuery?.whereKey("User", equalTo: otherUser)
-                    push.setQuery(installQuery)
-                    push.setData(data)
-                    push.sendPushInBackground()
                 }
             } else {
                 let friend = PFObject(className: "Follower")
@@ -530,22 +490,11 @@ public class FollowCell : UITableViewCell {
                 friend.setObject(false, forKey: "Accepted")
                 friend.saveInBackground()
                 self.addToFriends(otherUser)
-                Followers.append(otherUser)//friend)//follow)
-                let push = PFPush()
-                let data = [
-                    "alert" : "\((PFUser.currentUser()?["fullname"])! as! String) wants to follow you.",
-                    "badge" : "Increment",
-                    "ObjID" : (PFUser.currentUser()?.objectId!)! as String,
-                    "type" : "sendFollow"]
-                let installQuery = PFInstallation.query()
-                installQuery?.whereKey("User", equalTo: otherUser)
-                push.setQuery(installQuery)
-                push.setData(data)
-                push.sendPushInBackground()
+                Followers.append(otherUser)
             }
         }
     }
- 
+    
     @IBAction func TappedFollow(sender: UIButton) {
         if sender.selected == false {
             sender.selected = true

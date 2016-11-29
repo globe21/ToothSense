@@ -173,8 +173,8 @@ class SmilesCollectionViewCell: UICollectionViewCell {
         }
         CellImage.contentMode = .ScaleAspectFill
         CellImage.image = UIImage(named: "ProfileIcon")
-        //CellImage.layer.cornerRadius = (CellImage.frame.height) / 2
-        CellImage.layer.cornerRadius = 12
+        CellImage.layer.cornerRadius = (CellImage.frame.height) / 2
+        //CellImage.layer.cornerRadius = 12
         CellImage.tintColor = AppConfiguration.navText
         CellImage.layer.borderColor = UIColor.clearColor().CGColor
         CellImage.layer.borderWidth = 4.0
@@ -422,8 +422,9 @@ class SmilesViewController: UICollectionViewController, NavgationTransitionable 
                 for day in weekDates {
                     let AMQuery = PFQuery(className: "SmilesClub")
                     AMQuery.whereKey("User", equalTo: PFUser.currentUser()!)
-                    AMQuery.whereKey("brushDate", greaterThan: day.beginningOfDay)
-                    AMQuery.whereKey("brushDate", lessThanOrEqualTo: day.middleOfDay)
+                    AMQuery.whereKey("AMPM", equalTo: "AM")
+                    AMQuery.whereKey("brushDate", greaterThanOrEqualTo: day.beginningOfDay)
+                    AMQuery.whereKey("brushDate", lessThanOrEqualTo: day.endOfDay)
                     AMQuery.cachePolicy = .NetworkElseCache
                     AMQuery.maxCacheAge = 60*60
                     AMQuery.getFirstObjectInBackgroundWithBlock({ (object, error) in
@@ -455,7 +456,8 @@ class SmilesViewController: UICollectionViewController, NavgationTransitionable 
                     })
                     let PMQuery = PFQuery(className: "SmilesClub")
                     PMQuery.whereKey("User", equalTo: PFUser.currentUser()!)
-                    PMQuery.whereKey("brushDate", greaterThan: day.middleOfDay)
+                    PMQuery.whereKey("AMPM", equalTo: "PM")
+                    PMQuery.whereKey("brushDate", greaterThanOrEqualTo: day.beginningOfDay)
                     PMQuery.whereKey("brushDate", lessThanOrEqualTo: day.endOfDay)
                     PMQuery.cachePolicy = .NetworkElseCache
                     PMQuery.maxCacheAge = 60*60
@@ -568,29 +570,6 @@ extension SmilesViewController {
                 ProgressHUD.show("Loading Smiles...", spincolor1:AppConfiguration.navColor.darkenedColor(0.3), backcolor1:UIColor(white: 1.0, alpha: 0.2) , textcolor1:AppConfiguration.navColor.darkenedColor(0.4))
             }
             self.fetchData()
-        }
-    }
-    
-    override func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        guard let user: PFUser = objectArray[indexPath.row]["User"] as? PFUser else {
-            return
-        }
-        do {
-            try user.fetchIfNeeded()
-            let alertVC = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
-            let Profile = UIAlertAction(title: "View Sugar Bug Status", style: UIAlertActionStyle.Default) { (UIAlertAction) -> Void in
-                sideMenuNavigationController!.topViewController!.getMyProgress(user)
-            }
-            let Cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (UIAlertAction) -> Void in}
-            let Report = UIAlertAction(title: "Report \(user.fullname)", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
-                self.showReportUser(user)
-            }
-            alertVC.addAction(Report)
-            alertVC.addAction(Profile)
-            alertVC.addAction(Cancel)
-            self.presentViewController(alertVC, animated: true, completion: nil)
-        } catch {
-            
         }
     }
     

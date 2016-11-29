@@ -184,14 +184,6 @@ public class PNLineChart: UIView{
                     yMin = fmin(yMin, yValue)
                 }
             }
-            if yMax < 5 {
-                yMax = 5.0
-            }
-            if yMin < 0{
-                yMin = 0.0
-            }
-            yValueMin = yMin;
-            yValueMax = yMax;
             setNeedsDisplay()
         }
     }
@@ -204,9 +196,9 @@ public class PNLineChart: UIView{
     
     //For Y
     
-    public var yValueMax:CGFloat = 10.0
+    public let yValueMax:CGFloat = 150.0
     
-    public var yValueMin:CGFloat = 0.0
+    public let yValueMin:CGFloat = 0.0
     
     public var yLabelNum:CGFloat = 0.0
     

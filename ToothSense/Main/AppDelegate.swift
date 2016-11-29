@@ -26,18 +26,6 @@ let AMNotification = UILocalNotification()
 let PMNotification = UILocalNotification()
 
 let defaults = NSUserDefaults.standardUserDefaults()
-@available(iOS 10.0, *)
-var Notifycenter = UNUserNotificationCenter.currentNotificationCenter()
-
-
-@available(iOS 10.0, *)
-var movieAttachment: UNNotificationAttachment!
-@available(iOS 10.0, *)
-let content = UNMutableNotificationContent()
-@available(iOS 10.0, *)
-let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0, repeats: false)
-@available(iOS 10.0, *)
-var request: UNNotificationRequest!
 
 
 @UIApplicationMain
@@ -51,31 +39,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Parse.setApplicationId("RhYIPJ9diSnYaEcFGVoIGlUNU3V9u1Y6R7jn0Ec1", clientKey: "gafsXZByOHv6F5uZ0TfIzwKBPEgygdYz5p6LCti8")
         configureStyling()
         
-        if #available(iOS 10.0, *) {
-            Notifycenter.requestAuthorizationWithOptions([.Alert, .Sound, .Badge]) { (granted, error) in
-                if let error = error {
-                    print("error:\(error)")
-                } else if !granted {
-                    print("not granted")
-                } else {
-                    dispatch_async(dispatch_get_main_queue(), {
-                        //self.notifyBtn.isEnabled = true
-                    })
-                }
-            }
-            Notifycenter.delegate = self
-        } else {
-            let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert , .Badge , .Sound], categories: nil)
-            UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
-            UIApplication.sharedApplication().registerForRemoteNotifications()
-            if let options = launchOptions {
-                if let notification = options[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
-                    if let userInfo = notification.userInfo {
-                        let customField1 = userInfo["AMPM"] as! String
-                        let customField2 = userInfo["Date"] as! NSDate
-                        print("didReceiveLocalNotificationMain: \(customField1)")
-                        NSNotificationCenter.defaultCenter().postNotificationName("AMPMAlert", object: nil, userInfo: ["AMPM":customField1, "Date":customField2])
-                    }
+        let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert , .Badge , .Sound], categories: nil)
+        UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+        UIApplication.sharedApplication().registerForRemoteNotifications()
+        if let options = launchOptions {
+            if let notification = options[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
+                if let userInfo = notification.userInfo {
+                    let customField1 = userInfo["AMPM"] as! String
+                    let customField2 = userInfo["Date"] as! NSDate
+                    print("didReceiveLocalNotificationMain: \(customField1)")
+                    NSNotificationCenter.defaultCenter().postNotificationName("AMPMAlert", object: nil, userInfo: ["AMPM":customField1, "Date":customField2])
                 }
             }
         }
@@ -108,100 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    
-    @available(iOS 10.0, *)
-    private func userNotificationCenter(center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: () -> Void) {
-        print("Tapped in notification")
-        let actionIdentifier = response.actionIdentifier
-        if actionIdentifier == "com.apple.UNNotificationDefaultActionIdentifier" || actionIdentifier == "com.apple.UNNotificationDismissActionIdentifier" {
-            return;
-        }
-        let accept = (actionIdentifier == "com.elonchan.yes")
-        let decline = (actionIdentifier == "com.elonchan.no")
-        let snooze = (actionIdentifier == "com.elonchan.snooze")
-        
-        repeat {
-            if (accept) {
-                let title = "Tom is comming now"
-                self.addLabel(title, color: UIColor.yellowColor())
-                break;
-            }
-            if (decline) {
-                let title = "Tom won't come";
-                self.addLabel(title, color: UIColor.redColor())
-                break;
-            }
-            if (snooze) {
-                let title = "Tom will snooze for minute"
-                self.addLabel(title, color: UIColor.redColor());
-                break;
-            }
-        } while (false);
-        // Must be called when finished
-        completionHandler()//UNNotificationPresentationOptions.Alert);
-    }
-    
-    private func addLabel(title: String, color: UIColor) {
-        let label = UILabel.init()
-        label.backgroundColor = UIColor.redColor()
-        label.text = title
-        label.sizeToFit()
-        label.backgroundColor = color
-        let centerX = UIScreen.mainScreen().bounds.width * 0.5
-        let centerY = CGFloat(arc4random_uniform(UInt32(UIScreen.mainScreen().bounds.height)))
-        label.center = CGPoint(x: centerX, y: centerY)
-        self.window!.rootViewController!.view.addSubview(label)
-    }
-    
-    @available(iOS 10.0, *)
-    private func userNotificationCenter(center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: (UNNotificationPresentationOptions) -> Void) {
-        
-        // Must be called when finished, when you do not want foreground show, pass [] to the completionHandler()
-        completionHandler(UNNotificationPresentationOptions.Alert)
-        // completionHandler( UNNotificationPresentationOptions.sound)
-        // completionHandler( UNNotificationPresentationOptions.badge)
-    }
-    
-    @available(iOS 10.0, *)
-    func userNotificationCenter(center: UNUserNotificationCenter, didReceiveNotificationResponse response: UNNotificationResponse, withCompletionHandler completionHandler: () -> Void) {
-        content.title = "iOS-10-Sampler"
-        content.body = "This is the body."
-        content.sound = UNNotificationSound.defaultSound()
-        
-        let baseId = "com.shu223.ios10sampler"
-        let path: String = NSBundle.mainBundle().pathForResource("timer_6", ofType:"mp4")!
-        let url = NSURL.fileURLWithPath(path)
-        do {
-            movieAttachment = try UNNotificationAttachment(identifier: "\(baseId).attachment", URL: url, options: nil)
-            content.attachments = [movieAttachment]
-        } catch {
-            
-        }
-        request = UNNotificationRequest(identifier: "\(baseId).notification", content: content, trigger: trigger)
-        Notifycenter.addNotificationRequest(request) { (error) in
-            if let error = error {
-                print("error:\(error)")
-            } else {
-                let alert = UIAlertController(title: "Close this app", message: "A local notification has been scheduled. Close this app and wait 10 sec.", preferredStyle: UIAlertControllerStyle.Alert)
-                let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
-                alert.addAction(okAction)
-                sideMenuNavigationController!.topViewController!.presentViewController(alert, animated: true, completion: nil)
-                /*switch tabController!.selectedIndex {
-                case 0:sideMenuNavigationController!.topViewController!.presentViewController(alert, animated: true, completion: nil)
-                case 1:sideMenuNavigationController2!.topViewController!.presentViewController(alert, animated: true, completion: nil)
-                case 2:sideMenuNavigationController3!.topViewController!.presentViewController(alert, animated: true, completion: nil)
-                default:break
-                }*/
-            }
-        }
-        completionHandler()
-    }
-    
-    @available(iOS 10.0, *)
-    func userNotificationCenter(center: UNUserNotificationCenter, willPresentNotification notification: UNNotification, withCompletionHandler completionHandler: (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.Alert, .Sound, .Badge])
-    }
+extension AppDelegate {
 
     func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
         if notification == AMNotification {
@@ -216,7 +96,7 @@ private extension AppDelegate {
     
     func configureStyling() {
         window?.tintColor = AppConfiguration.navColor
-        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName : UIColor.whiteColor(), NSFontAttributeName : UIFont(name: "AmericanTypewriter-Bold", size: 25)!]
+        UINavigationBar.appearanceWhenContainedInInstancesOfClasses([UINavigationController.self]).titleTextAttributes = [NSForegroundColorAttributeName : UIColor.whiteColor(), NSFontAttributeName : UIFont(name: "AmericanTypewriter-Bold", size: 25)!]
         UINavigationBar.appearance().barTintColor = AppConfiguration.navColor
         UINavigationBar.appearance().tintColor = AppConfiguration.navText
         UIBarButtonItem.appearanceWhenContainedInInstancesOfClasses([UISearchBar.self]).setTitleTextAttributes([NSForegroundColorAttributeName : UIColor.whiteColor(), NSFontAttributeName : UIFont(name: "AmericanTypewriter-Bold", size: 20)!], forState: .Normal)

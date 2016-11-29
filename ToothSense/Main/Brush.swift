@@ -281,11 +281,14 @@ class Brush: UIViewController, UINavigationControllerDelegate, NavgationTransiti
     
     var Floss: Bool!
     
+    var shared: Bool = false
     
     override func viewWillDisappear(animated : Bool) {
         super.viewWillDisappear(animated)
-        if CMTimeGetSeconds(player!.currentTime()) != 0 {
-            startShare()
+        if shared == false {
+            if CMTimeGetSeconds(player!.currentTime()) != 0 {
+                startShare()
+            }
         }
         if player != nil {
             player!.pause()
@@ -355,23 +358,41 @@ class Brush: UIViewController, UINavigationControllerDelegate, NavgationTransiti
     
     func saveSmile(floss: Bool) {
         let current = NSDate()
-        let smile: PFObject = PFObject(className: "SmilesClub")
-        smile["User"] = PFUser.currentUser()
-        smile["userPic"] = PFUser.currentUser()!.profPic
-        smile["Name"] = PFUser.currentUser()!.fullname
-        smile["Age"] = "AGE: \(PFUser.currentUser()!.age)"
-        smile["brushTime"] = CMTimeGetSeconds(player!.currentTime())
-        smile["Flosser"] = floss
         let formatter:NSDateFormatter = NSDateFormatter()
         formatter.dateFormat = "a"
-        smile["brushDate"] = current
-        smile["AMPM"] = formatter.stringFromDate(current)
-        smile.saveInBackgroundWithBlock({ success, error in
-            tabController!.setSelectIndex(1, to: 0)
+        let AMPMQuery = PFQuery(className: "SmilesClub")
+        AMPMQuery.whereKey("User", equalTo: PFUser.currentUser()!)
+        AMPMQuery.whereKey("AMPM", equalTo: formatter.stringFromDate(current))
+        AMPMQuery.whereKey("brushDate", greaterThanOrEqualTo: current.beginningOfDay)
+        AMPMQuery.whereKey("brushDate", lessThanOrEqualTo: current.endOfDay)
+        AMPMQuery.cachePolicy = .NetworkElseCache
+        AMPMQuery.maxCacheAge = 60*60
+        AMPMQuery.getFirstObjectInBackgroundWithBlock({ (object, error) in
+            if error == nil {
+                object!["brushTime"] = CMTimeGetSeconds(self.player!.currentTime())
+                object!.saveInBackgroundWithBlock({ success, error in
+                    tabController!.setSelectIndex(1, to: 0)
+                })
+            } else {
+                let smile: PFObject = PFObject(className: "SmilesClub")
+                smile["User"] = PFUser.currentUser()
+                smile["userPic"] = PFUser.currentUser()!.profPic
+                smile["Name"] = PFUser.currentUser()!.fullname
+                smile["Age"] = "AGE: \(PFUser.currentUser()!.age)"
+                smile["brushTime"] = CMTimeGetSeconds(self.player!.currentTime())
+                smile["Flosser"] = floss
+                smile["brushDate"] = current
+                smile["AMPM"] = formatter.stringFromDate(current)
+                smile.saveInBackgroundWithBlock({ success, error in
+                    tabController!.setSelectIndex(1, to: 0)
+                })
+            }
         })
+        
     }
     
     func startShare() {
+        shared = true
         player!.pause()
         timer = CMTimeGetSeconds(player!.currentTime())
         var shareImage : UIImage!
@@ -390,7 +411,7 @@ class Brush: UIViewController, UINavigationControllerDelegate, NavgationTransiti
         if timer != 0 {
             let secs: CGFloat = CGFloat(timer!)
             let popup: PopupDialog = PopupDialog(title: "BRUSHED FOR: \(secs.toMinSec())", message: "WOULD YOU LIKE TO SHARE?", image: shareImage)
-            let buttonCancel = CancelButton(title: "CANCEL") { }
+            let buttonCancel = CancelButton(title: "CANCEL") { self.shared = false }
             let buttonTwo = DefaultButton(title: "SHARE") {
                 let popup: PopupDialog = PopupDialog(title: "DID YOU FLOSS?", message: nil, image: UIImage(named: "flossicon")!)
                 let buttonCancel = CancelButton(title: "NO") {
