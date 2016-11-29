@@ -24,7 +24,7 @@
 		3DA673641DE33DC000CC6F0B /* part1ScreenShot.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DA6735F1DE33DC000CC6F0B /* part1ScreenShot.png */; };
 		3DA673651DE33DC000CC6F0B /* part2ScreenShot.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DA673601DE33DC000CC6F0B /* part2ScreenShot.png */; };
 		3DA673661DE33DC000CC6F0B /* SugarBugScreenShot.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DA673611DE33DC000CC6F0B /* SugarBugScreenShot.png */; };
-		3DAEDC531DE30434001D95C6 /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DAEDC521DE30434001D95C6 /* VideoPlayer.swift */; };
+		3DADFB5E1DECE6FA00CD9DAC /* teethingScreenShot.png in Resources */ = {isa = PBXBuildFile; fileRef = 3DADFB5D1DECE6FA00CD9DAC /* teethingScreenShot.png */; };
 		3DFAE02F1D9C9878004F6067 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFAE0241D9C9878004F6067 /* AppDelegate.swift */; };
 		3DFAE0301D9C9878004F6067 /* Brush.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFAE0251D9C9878004F6067 /* Brush.swift */; };
 		3DFAE0311D9C9878004F6067 /* BrushChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DFAE0261D9C9878004F6067 /* BrushChart.swift */; };
@@ -234,7 +234,7 @@
 		3DA6735F1DE33DC000CC6F0B /* part1ScreenShot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = part1ScreenShot.png; sourceTree = "<group>"; };
 		3DA673601DE33DC000CC6F0B /* part2ScreenShot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = part2ScreenShot.png; sourceTree = "<group>"; };
 		3DA673611DE33DC000CC6F0B /* SugarBugScreenShot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SugarBugScreenShot.png; sourceTree = "<group>"; };
-		3DAEDC521DE30434001D95C6 /* VideoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoPlayer.swift; sourceTree = "<group>"; };
+		3DADFB5D1DECE6FA00CD9DAC /* teethingScreenShot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = teethingScreenShot.png; sourceTree = "<group>"; };
 		3DCD728F1D6E5E9500BACCED /* ToothSense.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToothSense.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3DCD729E1D6E5E9500BACCED /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3DFAE0241D9C9878004F6067 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Main/AppDelegate.swift; sourceTree = "<group>"; };
@@ -520,6 +520,7 @@
 				3DFAE0C11D9CAFCD004F6067 /* BrushYourTeeth.mp4 */,
 				3DFAE0C21D9CAFCD004F6067 /* teething.mov */,
 				3DFAE0C31D9CAFCD004F6067 /* toby.mov */,
+				3DADFB5D1DECE6FA00CD9DAC /* teethingScreenShot.png */,
 			);
 			name = Videos;
 			sourceTree = "<group>";
@@ -567,7 +568,6 @@
 				3DFAE02B1D9C9878004F6067 /* ScrollPager.swift */,
 				3D8103E31DE1474E0075BF5A /* SendQuestion.swift */,
 				3DFAE02C1D9C9878004F6067 /* SideMenuVC.swift */,
-				3DAEDC521DE30434001D95C6 /* VideoPlayer.swift */,
 				3DFAE02D1D9C9878004F6067 /* SmilesViewController.swift */,
 				3DFAE02E1D9C9878004F6067 /* VideoTable.swift */,
 			);
@@ -849,6 +849,7 @@
 				3DFAE1611D9CB199004F6067 /* Eureka.bundle in Resources */,
 				3DFAE0CA1D9CAFCD004F6067 /* toby.mov in Resources */,
 				3DA673661DE33DC000CC6F0B /* SugarBugScreenShot.png in Resources */,
+				3DADFB5E1DECE6FA00CD9DAC /* teethingScreenShot.png in Resources */,
 				3DFAE0871D9C9A1B004F6067 /* Main.storyboard in Resources */,
 				3DFAE0C71D9CAFCD004F6067 /* babyteeth.mov in Resources */,
 				3DFAE0971D9CAE26004F6067 /* ProgressHUD.bundle in Resources */,
@@ -1027,7 +1028,6 @@
 				3DFAE1751D9CB199004F6067 /* PostalAddressRow.swift in Sources */,
 				3DFAE0301D9C9878004F6067 /* Brush.swift in Sources */,
 				3DFAE0951D9CAE26004F6067 /* MGSwipeButton.m in Sources */,
-				3DAEDC531DE30434001D95C6 /* VideoPlayer.swift in Sources */,
 				3DFAE1701D9CB199004F6067 /* Operators.swift in Sources */,
 				3DFAE1D01D9CB4EB004F6067 /* PresentationController.swift in Sources */,
 				3DFAE0641D9C98CA004F6067 /* TRViewControllerAnimatedTransitioning.swift in Sources */,

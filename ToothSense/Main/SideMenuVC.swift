@@ -258,7 +258,7 @@ class SideMenuVC: UIViewController,KSideMenuVCDelegate, UITableViewDelegate, UIT
         tableView.delegate = self
         tableView.dataSource = self
         ProfileImage.setProfPic(UIColor.whiteColor())
-        NameField.text = PFUser.currentUser()!.Fullname()
+        NameField.text = PFUser.currentUser()!.fullname
     }
     
     override func prefersStatusBarHidden() -> Bool {
@@ -309,9 +309,9 @@ class SideMenuVC: UIViewController,KSideMenuVCDelegate, UITableViewDelegate, UIT
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.row == 0 {
             sideMenuVC.closeMenu()
-            BuildController.age = PFUser.currentUser()!.getBirthday()
-            BuildController.fullname = PFUser.currentUser()!.Fullname()
-            ProfileImage.file = PFUser.currentUser()!.getProfPic()
+            BuildController.age = PFUser.currentUser()!.birthday
+            BuildController.fullname = PFUser.currentUser()!.fullname
+            ProfileImage.file = PFUser.currentUser()!.profPic
             ProfileImage.loadInBackground({ (image, error) in
                 if error == nil {
                     BuildController.profileImage = image!

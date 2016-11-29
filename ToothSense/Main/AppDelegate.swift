@@ -40,7 +40,6 @@ let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0, repeats: false)
 var request: UNNotificationRequest!
 
 
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -82,8 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         //Fabric.with([Crashlytics.self])
         if PFUser.currentUser() != nil {
-            let mainVcIntial = kConstantObj.SetIntialMainViewController()
-            appDelegate.window?.rootViewController = mainVcIntial
+            appDelegate.window?.rootViewController = kConstantObj.SetIntialMainViewController()
         }
         UIApplication.sharedApplication().applicationIconBadgeNumber = 0
         return true

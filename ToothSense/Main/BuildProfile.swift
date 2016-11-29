@@ -246,14 +246,7 @@ class BuildViewController : FormViewController, NavgationTransitionable {
                         }
                         let pictureFile = PFFile(name: "picture.jpg", data: UIImageJPEGRepresentation(image, 0.6)!)
                         pictureFile!.saveInBackground()
-                        //(imageRow.cell.accessoryView as! UIImageView).image = image
-                        if image.size.width > 60 {
-                            image = Images.resizeImage(image, width: 60, height: 60)!
-                        }
-                        let thumbnailFile = PFFile(name: "thumbnail.jpg", data: UIImageJPEGRepresentation(image, 0.6)!)
-                        thumbnailFile!.saveInBackground()
                         PFUser.currentUser()!["profPic"] = pictureFile
-                        PFUser.currentUser()!["thumbnail"] = thumbnailFile
                         if self.age != nil {
                             PFUser.currentUser()!["Birthday"] = self.age
                         }
@@ -422,13 +415,7 @@ class BuildViewController : FormViewController, NavgationTransitionable {
                         let pictureFile = PFFile(name: "picture.jpg", data: UIImageJPEGRepresentation(image, 0.6)!)
                         pictureFile!.saveInBackground()
                         (imageRow.cell.accessoryView as! UIImageView).image = image
-                        if image.size.width > 60 {
-                            image = Images.resizeImage(image, width: 60, height: 60)!
-                        }
-                        let thumbnailFile = PFFile(name: "thumbnail.jpg", data: UIImageJPEGRepresentation(image, 0.6)!)
-                        thumbnailFile!.saveInBackground()
                         PFUser.currentUser()!["profPic"] = pictureFile
-                        PFUser.currentUser()!["thumbnail"] = thumbnailFile
                         if self.age != nil {
                             PFUser.currentUser()!["Birthday"] = self.age
                         }
@@ -598,13 +585,7 @@ class BuildViewController : FormViewController, NavgationTransitionable {
                         let pictureFile = PFFile(name: "picture.jpg", data: UIImageJPEGRepresentation(image, 0.6)!)
                         pictureFile!.saveInBackground()
                         (imageRow.cell.accessoryView as! UIImageView).image = image
-                        if image.size.width > 60 {
-                            image = Images.resizeImage(image, width: 60, height: 60)!
-                        }
-                        let thumbnailFile = PFFile(name: "thumbnail.jpg", data: UIImageJPEGRepresentation(image, 0.6)!)
-                        thumbnailFile!.saveInBackground()
                         PFUser.currentUser()!["profPic"] = pictureFile
-                        PFUser.currentUser()!["thumbnail"] = thumbnailFile
                         if self.age != nil {
                             PFUser.currentUser()!["Birthday"] = self.age
                         }

@@ -194,7 +194,7 @@ class FriendListViewController: UIViewController, UITableViewDataSource, UITable
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         let followquery = PFUser.query()
         followquery!.whereKey("fullname", hasPrefix: searchText)
-        followquery!.whereKey("fullname", notEqualTo: PFUser.currentUser()!.Fullname())
+        followquery!.whereKey("fullname", notEqualTo: PFUser.currentUser()!.fullname)
         followquery!.limit = 999
         followquery!.findObjectsInBackgroundWithBlock({
             objects, error in
@@ -415,6 +415,39 @@ public class FollowCell : UITableViewCell {
         self.getParentViewController()!.presentViewController(popup, animated: true, completion: nil)
     }
     
+    func addToFriends(otherUser: PFUser) {
+        if PFUser.currentUser()!["Friends"] != nil {
+            var friends: [PFUser] = PFUser.currentUser()!["Friends"] as! [PFUser]
+            var friendIDs: [String] = [String]()
+            friends.forEach({ (user) in
+                friendIDs.append(user.objectId!)
+            })
+            if !friendIDs.contains(otherUser.objectId!) {
+                friends.append(otherUser)
+                PFUser.currentUser()!["Friends"] = friends
+                PFUser.currentUser()!.saveInBackground()
+            }
+        } else {
+            PFUser.currentUser()!["Friends"] = [otherUser]
+            PFUser.currentUser()!.saveInBackground()
+        }
+    }
+    
+    func removeFromFriends(otherUser: PFUser) {
+        if PFUser.currentUser()!["Friends"] != nil {
+            var friends: [PFUser] = PFUser.currentUser()!["Friends"] as! [PFUser]
+            var friendIDs: [String] = [String]()
+            friends.forEach({ (user) in
+                friendIDs.append(user.objectId!)
+            })
+            if !friendIDs.contains(otherUser.objectId!) {
+                let index = friends.indexOf(otherUser)
+                friends.removeAtIndex(index!)
+                PFUser.currentUser()!["Friends"] = friends
+                PFUser.currentUser()!.saveInBackground()
+            }
+        }
+    }
     
     func removeFollow(otherUser: PFUser) {
         let query = PFQuery(className: "Follower")
@@ -437,6 +470,7 @@ public class FollowCell : UITableViewCell {
                     object["Active"] = false
                     object["Accepted"] = false
                     object.saveInBackground()
+                    self.removeFromFriends(otherUser)
                 }
             }
         }
@@ -456,6 +490,7 @@ public class FollowCell : UITableViewCell {
                     friend.setObject(true, forKey: "Active")
                     friend.setObject(false, forKey: "Accepted")
                     friend.saveInBackground()
+                    self.addToFriends(otherUser)
                     //if PFUser.currentUser()
                     Followers.append(otherUser)//friend)
                     let push = PFPush()
@@ -474,6 +509,7 @@ public class FollowCell : UITableViewCell {
                     object!["Active"] = true
                     object!["Accepted"] = true
                     object!.saveInBackground()
+                    self.addToFriends(otherUser)
                     let push = PFPush()
                     let data = [
                         "alert" : "\((PFUser.currentUser()?["fullname"])! as! String) wants to follow you.",
@@ -493,6 +529,7 @@ public class FollowCell : UITableViewCell {
                 friend.setObject(true, forKey: "Active")
                 friend.setObject(false, forKey: "Accepted")
                 friend.saveInBackground()
+                self.addToFriends(otherUser)
                 Followers.append(otherUser)//friend)//follow)
                 let push = PFPush()
                 let data = [

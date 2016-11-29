@@ -15,10 +15,42 @@ import Parse
 import ParseUI
 
 extension UIViewController {
+    
+    typealias GCDClosure = () -> Void
+    
+    @objc func GlobalUserInteractive(closure: GCDClosure) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0)) {
+            closure()
+        }
+    }
+    
+    @objc func GlobalUtility(closure: GCDClosure) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0)) {
+            closure()
+        }
+    }
+    
+    @objc func GlobalUserInitiated(closure: GCDClosure) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0)) {
+            closure()
+        }
+    }
+    
+    @objc func GlobalMain(closure: GCDClosure) {
+        dispatch_async(dispatch_get_main_queue()) {
+            closure()
+        }
+    }
+    
+    @objc func GlobalBackground(closure: GCDClosure) {
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0)) {
+            closure()
+        }
+    }
+    
     func getMyProgress(user: PFUser) {
         var progress: CGFloat = 0.05
-        let userQuery = PFUser.query()
-        userQuery!.getObjectInBackgroundWithId(user.objectId!, block: { (object, error) in
+        PFUser.query()!.getObjectInBackgroundWithId(user.objectId!, block: { (object, error) in
             if error == nil {
                 let user = object as! PFUser
                 if user["AverageBrushTime"] != nil {
@@ -176,8 +208,8 @@ class SmilesCollectionViewCell: UICollectionViewCell {
             userQuery?.getObjectInBackgroundWithId(user.objectId!, block: { (user, error) in
                 if error == nil {
                     let user = user as! PFUser
-                    if user["thumbnail"] != nil {
-                        self.CellImage.file = user["thumbnail"] as? PFFile
+                    if user["profPic"] != nil {
+                        self.CellImage.file = user.profPic
                         self.CellImage.loadInBackground() { image, error in
                             if error == nil {
                                 self.CellImage.layer.borderColor = AppConfiguration.navText.CGColor
@@ -194,12 +226,8 @@ class SmilesCollectionViewCell: UICollectionViewCell {
                         self.CellImage.image = UIImage(named: "ProfileIcon")
                         self.CellImage.layer.borderColor = UIColor.clearColor().CGColor
                     }
-                    if user["fullname"] != nil {
-                        self.userLabel.attributedText = NSMutableAttributedString(string: user["fullname"] as! String, attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
-                    } else {
-                        self.userLabel.attributedText = NSMutableAttributedString(string: "No Name", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
-                    }
-                    self.AgeLabel.attributedText = NSMutableAttributedString(string: "AGE: \(user.getAge())", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 27.0)!])
+                    self.userLabel.attributedText = NSMutableAttributedString(string: user.fullname, attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
+                    self.AgeLabel.attributedText = NSMutableAttributedString(string: "AGE: \(user.age)", attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 27.0)!])
                 } else {
                     if self.object["fullname"] != nil {
                         self.userLabel.attributedText = NSMutableAttributedString(string: self.object["Name"] as! String, attributes: [NSForegroundColorAttributeName : AppConfiguration.navText, NSFontAttributeName:UIFont(name: "AmericanTypewriter-Bold", size: 30.0)!])
@@ -269,7 +297,7 @@ class SmilesViewController: UICollectionViewController, NavgationTransitionable 
     override func viewDidLoad() {
         view.backgroundColor = AppConfiguration.backgroundColor
         collectionView!.backgroundColor = AppConfiguration.backgroundColor
-        self.navigationItem.title = "Smiles Club"
+        self.title = "Smiles Club"
         self.collectionView!.registerClass(SmilesCollectionViewCell.self, forCellWithReuseIdentifier: "smileCellReuse")
         refreshControl.tintColor = UIColor.wheatColor()
         collectionView!.addSubview(refreshControl)
@@ -304,41 +332,74 @@ class SmilesViewController: UICollectionViewController, NavgationTransitionable 
             smilesQuery.cachePolicy = .NetworkElseCache
             smilesQuery.maxCacheAge = 60*60
             smilesQuery.skip = pageNumber*20
-            smilesQuery.findObjectsInBackgroundWithBlock({ (objects, error) in
-                if error == nil {
-                    if self.pageNumber == 0 {
-                        self.objectArray.removeAll()
+            if PFUser.currentUser()!["BlockedPeople"] != nil {
+                smilesQuery.whereKey("User", notContainedIn: PFUser.currentUser()!.BlockedUsers)
+            }
+            if PFUser.currentUser()!["Friends"] != nil {
+                smilesQuery.whereKey("User", containedIn: PFUser.currentUser()!.Friends)
+                smilesQuery.findObjectsInBackgroundWithBlock({ (objects, error) in
+                    if error == nil {
+                        if self.pageNumber == 0 {
+                            self.objectArray.removeAll()
+                        }
+                        var array : [PFObject] = [PFObject]()
+                        if (self.forceRefresh) {
+                            array.appendContentsOf(self.objectArray)
+                        }
+                        for object in objects! {
+                            array.append(object)
+                        }
+                        self.objectArray.appendContentsOf(array)
+                        self.collectionView!.reloadData()
+                        self.refreshControl.endRefreshing()
+                        self.requestInProgress = false
+                        self.forceRefresh = false
+                        if (objects!.count<20) {
+                            self.stopFetching = false
+                        }
+                        self.pageNumber += 1
+                        ProgressHUD.dismiss()
+                    } else {
+                        self.requestInProgress = false
+                        self.forceRefresh = false
+                        self.refreshControl.endRefreshing()
+                        ProgressHUD.dismiss()
                     }
-                    var array : [PFObject] = [PFObject]()
-                    if (self.forceRefresh) {
-                        array.appendContentsOf(self.objectArray)
+                })
+            } else {
+                smilesQuery.whereKey("User", equalTo: PFUser.currentUser()!)
+                smilesQuery.findObjectsInBackgroundWithBlock({ (objects, error) in
+                    if error == nil {
+                        if self.pageNumber == 0 {
+                            self.objectArray.removeAll()
+                        }
+                        var array : [PFObject] = [PFObject]()
+                        if (self.forceRefresh) {
+                            array.appendContentsOf(self.objectArray)
+                        }
+                        for object in objects! {
+                            array.append(object)
+                        }
+                        self.objectArray.appendContentsOf(array)
+                        self.collectionView!.reloadData()
+                        self.refreshControl.endRefreshing()
+                        self.requestInProgress = false
+                        self.forceRefresh = false
+                        if (objects!.count<20) {
+                            self.stopFetching = false
+                        }
+                        self.pageNumber += 1
+                        ProgressHUD.dismiss()
+                    } else {
+                        self.requestInProgress = false
+                        self.forceRefresh = false
+                        self.refreshControl.endRefreshing()
+                        ProgressHUD.dismiss()
                     }
-                    for object in objects! {
-                        array.append(object)
-                    }
-                    self.objectArray.appendContentsOf(array)
-                    self.collectionView!.reloadData()
-                    self.refreshControl.endRefreshing()
-                    self.requestInProgress = false
-                    self.forceRefresh = false
-                    if (objects!.count<20) {
-                        self.stopFetching = false
-                    }
-                    self.pageNumber += 1
-                    ProgressHUD.dismiss()
-                } else {
-                    self.requestInProgress = false
-                    self.forceRefresh = false
-                    self.refreshControl.endRefreshing()
-                    ProgressHUD.dismiss()
-                }
-                self.collectionView!.emptyDataSetSource = self
-                self.collectionView!.emptyDataSetDelegate = self
-                
-            })
+                })
+            }
         }
     }
-    
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -355,82 +416,81 @@ class SmilesViewController: UICollectionViewController, NavgationTransitionable 
             }
             defaults.setBool(false, forKey: "SugarBugStatus")
         }
-        
-        if PFUser.currentUser() != nil {
-            weekDates = getWeekDates()
-            for day in weekDates {
-                let AMQuery = PFQuery(className: "SmilesClub")
-                AMQuery.whereKey("User", equalTo: PFUser.currentUser()!)
-                AMQuery.whereKey("brushDate", greaterThan: day.beginningOfDay)
-                AMQuery.whereKey("brushDate", lessThanOrEqualTo: day.middleOfDay)
-                AMQuery.cachePolicy = .NetworkElseCache
-                AMQuery.maxCacheAge = 60*60
-                AMQuery.getFirstObjectInBackgroundWithBlock({ (object, error) in
-                    if error == nil {
-                        let object = object!
-                        if day == weekDates[0] {
-                            AMTimes.removeAtIndex(0)
-                            AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 0)
-                        } else if day == weekDates[1] {
-                            AMTimes.removeAtIndex(1)
-                            AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 1)
-                        } else if day == weekDates[2] {
-                            AMTimes.removeAtIndex(2)
-                            AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 2)
-                        } else if day == weekDates[3] {
-                            AMTimes.removeAtIndex(3)
-                            AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 3)
-                        } else if day == weekDates[4] {
-                            AMTimes.removeAtIndex(4)
-                            AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 4)
-                        } else if day == weekDates[5] {
-                            AMTimes.removeAtIndex(5)
-                            AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 5)
-                        } else if day == weekDates[6] {
-                            AMTimes.removeAtIndex(6)
-                            AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 6)
+        GlobalBackground { 
+            if PFUser.currentUser() != nil {
+                weekDates = self.getWeekDates()
+                for day in weekDates {
+                    let AMQuery = PFQuery(className: "SmilesClub")
+                    AMQuery.whereKey("User", equalTo: PFUser.currentUser()!)
+                    AMQuery.whereKey("brushDate", greaterThan: day.beginningOfDay)
+                    AMQuery.whereKey("brushDate", lessThanOrEqualTo: day.middleOfDay)
+                    AMQuery.cachePolicy = .NetworkElseCache
+                    AMQuery.maxCacheAge = 60*60
+                    AMQuery.getFirstObjectInBackgroundWithBlock({ (object, error) in
+                        if error == nil {
+                            let object = object!
+                            if day == weekDates[0] {
+                                AMTimes.removeAtIndex(0)
+                                AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 0)
+                            } else if day == weekDates[1] {
+                                AMTimes.removeAtIndex(1)
+                                AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 1)
+                            } else if day == weekDates[2] {
+                                AMTimes.removeAtIndex(2)
+                                AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 2)
+                            } else if day == weekDates[3] {
+                                AMTimes.removeAtIndex(3)
+                                AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 3)
+                            } else if day == weekDates[4] {
+                                AMTimes.removeAtIndex(4)
+                                AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 4)
+                            } else if day == weekDates[5] {
+                                AMTimes.removeAtIndex(5)
+                                AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 5)
+                            } else if day == weekDates[6] {
+                                AMTimes.removeAtIndex(6)
+                                AMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 6)
+                            }
                         }
-                    }
-                })
-                let PMQuery = PFQuery(className: "SmilesClub")
-                PMQuery.whereKey("User", equalTo: PFUser.currentUser()!)
-                PMQuery.whereKey("brushDate", greaterThan: day.middleOfDay)
-                PMQuery.whereKey("brushDate", lessThanOrEqualTo: day.endOfDay)
-                PMQuery.cachePolicy = .NetworkElseCache
-                PMQuery.maxCacheAge = 60*60
-                PMQuery.getFirstObjectInBackgroundWithBlock({ (object, error) in
-                    if error == nil {
-                        let object = object!
-                        if day == weekDates[0] {
-                            PMTimes.removeAtIndex(0)
-                            PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 0)
-                        } else if day == weekDates[1] {
-                            PMTimes.removeAtIndex(1)
-                            PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 1)
-                        } else if day == weekDates[2] {
-                            PMTimes.removeAtIndex(2)
-                            PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 2)
-                        } else if day == weekDates[3] {
-                            PMTimes.removeAtIndex(3)
-                            PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 3)
-                        } else if day == weekDates[4] {
-                            PMTimes.removeAtIndex(4)
-                            PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 4)
-                        } else if day == weekDates[5] {
-                            PMTimes.removeAtIndex(5)
-                            PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 5)
-                        } else if day == weekDates[6] {
-                            PMTimes.removeAtIndex(6)
-                            PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 6)
+                    })
+                    let PMQuery = PFQuery(className: "SmilesClub")
+                    PMQuery.whereKey("User", equalTo: PFUser.currentUser()!)
+                    PMQuery.whereKey("brushDate", greaterThan: day.middleOfDay)
+                    PMQuery.whereKey("brushDate", lessThanOrEqualTo: day.endOfDay)
+                    PMQuery.cachePolicy = .NetworkElseCache
+                    PMQuery.maxCacheAge = 60*60
+                    PMQuery.getFirstObjectInBackgroundWithBlock({ (object, error) in
+                        if error == nil {
+                            let object = object!
+                            if day == weekDates[0] {
+                                PMTimes.removeAtIndex(0)
+                                PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 0)
+                            } else if day == weekDates[1] {
+                                PMTimes.removeAtIndex(1)
+                                PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 1)
+                            } else if day == weekDates[2] {
+                                PMTimes.removeAtIndex(2)
+                                PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 2)
+                            } else if day == weekDates[3] {
+                                PMTimes.removeAtIndex(3)
+                                PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 3)
+                            } else if day == weekDates[4] {
+                                PMTimes.removeAtIndex(4)
+                                PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 4)
+                            } else if day == weekDates[5] {
+                                PMTimes.removeAtIndex(5)
+                                PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 5)
+                            } else if day == weekDates[6] {
+                                PMTimes.removeAtIndex(6)
+                                PMTimes.insert(object["brushTime"] as! CGFloat, atIndex: 6)
+                            }
                         }
-                    }
-                })
-                
+                    })
+                    
+                }
             }
         }
     }
-    
-    
 }
 
 extension SmilesViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
@@ -461,28 +521,6 @@ extension SmilesViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
         } else {
             sideMenuNavigationController!.tr_pushViewController(FriendsControl, method: TRPushTransitionMethod.Fade)
         }
-        /*switch tabController!.selectedIndex {
-        case 0:
-            if sideMenuNavigationController!.viewControllers.contains(FriendsControl) {
-                sideMenuNavigationController!.tr_popToViewController(FriendsControl)
-            } else {
-                sideMenuNavigationController!.tr_pushViewController(FriendsControl, method: TRPushTransitionMethod.Fade)
-            }
-        case 1:
-            if sideMenuNavigationController2!.viewControllers.contains(FriendsControl) {
-                sideMenuNavigationController2!.tr_popToViewController(FriendsControl)
-            } else {
-                sideMenuNavigationController2!.tr_pushViewController(FriendsControl, method: TRPushTransitionMethod.Fade)
-            }
-        case 2:
-            if sideMenuNavigationController3!.viewControllers.contains(FriendsControl) {
-                sideMenuNavigationController3!.tr_popToViewController(FriendsControl)
-            } else {
-                sideMenuNavigationController3!.tr_pushViewController(FriendsControl, method: TRPushTransitionMethod.Fade)
-            }
-        default:
-            break
-        }*/
     }
     
     func spaceHeightForEmptyDataSet(scrollView: UIScrollView!) -> CGFloat {
@@ -526,7 +564,7 @@ extension SmilesViewController {
             cell.contentView.backgroundColor = UIColor.colorFromHexString(colorsArray[color])
         }
         if (indexPath.row + 1) == (pageNumber * 20) {// == objectArray.count-1) {
-            if (!refreshControl.refreshing) {
+            if (!refreshControl.refreshing) &&  requestInProgress == false {
                 ProgressHUD.show("Loading Smiles...", spincolor1:AppConfiguration.navColor.darkenedColor(0.3), backcolor1:UIColor(white: 1.0, alpha: 0.2) , textcolor1:AppConfiguration.navColor.darkenedColor(0.4))
             }
             self.fetchData()
@@ -544,7 +582,7 @@ extension SmilesViewController {
                 sideMenuNavigationController!.topViewController!.getMyProgress(user)
             }
             let Cancel = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (UIAlertAction) -> Void in}
-            let Report = UIAlertAction(title: "Report \(user.Fullname())", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
+            let Report = UIAlertAction(title: "Report \(user.fullname)", style: UIAlertActionStyle.Destructive) { (UIAlertAction) -> Void in
                 self.showReportUser(user)
             }
             alertVC.addAction(Report)

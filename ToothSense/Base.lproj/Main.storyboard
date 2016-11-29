@@ -615,12 +615,20 @@
                                     </mask>
                                 </variation>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CAe-t2-Yc1">
+                                <rect key="frame" x="36" y="0.0" width="155.5" height="667"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" red="0.63522332906723022" green="0.63533496856689453" blue="0.63521629571914673" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="CAe-t2-Yc1" firstAttribute="trailing" secondItem="ZX4-YU-nnR" secondAttribute="leading" id="4dk-Aa-VJn"/>
                             <constraint firstItem="ZX4-YU-nnR" firstAttribute="top" secondItem="oy3-aK-EXc" secondAttribute="bottom" constant="-20" id="4e1-Lh-KVj"/>
+                            <constraint firstAttribute="leadingMargin" secondItem="CAe-t2-Yc1" secondAttribute="leading" constant="-20" id="KaB-es-4VW"/>
+                            <constraint firstItem="CAe-t2-Yc1" firstAttribute="centerY" secondItem="bNc-q8-YbS" secondAttribute="centerY" id="KaT-Ud-cYb"/>
                             <constraint firstItem="ZX4-YU-nnR" firstAttribute="width" secondItem="bNc-q8-YbS" secondAttribute="width" multiplier="0.5" id="Lgz-SX-uPO"/>
                             <constraint firstAttribute="trailingMargin" secondItem="ZX4-YU-nnR" secondAttribute="trailing" constant="-20" id="j9R-au-pv1"/>
+                            <constraint firstItem="CAe-t2-Yc1" firstAttribute="height" secondItem="bNc-q8-YbS" secondAttribute="height" id="qd5-dg-iWV"/>
                             <constraint firstItem="KCQ-Ee-FWV" firstAttribute="top" secondItem="ZX4-YU-nnR" secondAttribute="bottom" id="vWp-sB-fgh"/>
                         </constraints>
                     </view>
@@ -634,7 +642,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N1w-6E-adX" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="833" y="141"/>
+            <point key="canvasLocation" x="832.79999999999995" y="139.880059970015"/>
         </scene>
         <!--Build View Controller-->
         <scene sceneID="Rkl-Qv-qe9">
@@ -671,71 +679,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="o1P-AK-l1c" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="833" y="815"/>
-        </scene>
-        <!--Educational Videos-->
-        <scene sceneID="3P4-mC-gRx">
-            <objects>
-                <viewController storyboardIdentifier="VideoTable" id="GUC-EC-8Fs" customClass="VideoTable" customModule="ToothSense" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="zBj-hh-ik7"/>
-                        <viewControllerLayoutGuide type="bottom" id="er4-et-Y4h"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="g07-Iu-RhT">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="qRC-vZ-X91">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                                <color key="backgroundColor" red="0.97573274369999996" green="0.64573812480000004" blue="0.26096984740000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <connections>
-                                    <outlet property="dataSource" destination="GUC-EC-8Fs" id="8sJ-Wi-CFj"/>
-                                    <outlet property="delegate" destination="GUC-EC-8Fs" id="ege-EW-Eyb"/>
-                                </connections>
-                            </tableView>
-                        </subviews>
-                        <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="qRC-vZ-X91" firstAttribute="height" secondItem="g07-Iu-RhT" secondAttribute="height" id="PdU-Hj-8JI"/>
-                            <constraint firstItem="qRC-vZ-X91" firstAttribute="width" secondItem="g07-Iu-RhT" secondAttribute="width" id="YBz-oE-9Pa"/>
-                            <constraint firstItem="qRC-vZ-X91" firstAttribute="centerY" secondItem="g07-Iu-RhT" secondAttribute="centerY" id="cPJ-TO-sxn"/>
-                            <constraint firstItem="qRC-vZ-X91" firstAttribute="centerX" secondItem="g07-Iu-RhT" secondAttribute="centerX" id="eYn-EV-cvP"/>
-                        </constraints>
-                    </view>
-                    <extendedEdge key="edgesForExtendedLayout"/>
-                    <tabBarItem key="tabBarItem" title="Educational Videos" image="video" id="Feg-RC-PxK" customClass="RAMAnimatedTabBarItem" customModule="ToothSense" customModuleProvider="target">
-                        <userDefinedRuntimeAttributes>
-                            <userDefinedRuntimeAttribute type="color" keyPath="textColor">
-                                <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </userDefinedRuntimeAttribute>
-                            <userDefinedRuntimeAttribute type="color" keyPath="iconColor">
-                                <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            </userDefinedRuntimeAttribute>
-                        </userDefinedRuntimeAttributes>
-                        <connections>
-                            <outlet property="animation" destination="JUg-Ki-qBC" id="7hj-W8-Aq1"/>
-                        </connections>
-                    </tabBarItem>
-                    <connections>
-                        <outlet property="VideoTableTabAnimation" destination="JUg-Ki-qBC" id="XwM-F8-xmP"/>
-                        <outlet property="tableView" destination="qRC-vZ-X91" id="ehb-df-EBZ"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="NXc-G6-bvF" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <customObject id="JUg-Ki-qBC" customClass="RAMFumeAnimation" customModule="ToothSense" customModuleProvider="target">
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="color" keyPath="textSelectedColor">
-                            <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="color" keyPath="iconSelectedColor">
-                            <color key="value" red="0.7254902124" green="0.4784313738" blue="0.098039217289999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        </userDefinedRuntimeAttribute>
-                        <userDefinedRuntimeAttribute type="number" keyPath="duration">
-                            <real key="value" value="0.59999999999999998"/>
-                        </userDefinedRuntimeAttribute>
-                    </userDefinedRuntimeAttributes>
-                </customObject>
-            </objects>
-            <point key="canvasLocation" x="1577" y="815"/>
         </scene>
         <!--Empty Data Set Delegate-->
         <scene sceneID="bz3-hc-DjD">
@@ -1075,6 +1018,167 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mhY-6F-Ukj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2276" y="815"/>
+        </scene>
+        <!--Educational Videos-->
+        <scene sceneID="mNN-ql-p1D">
+            <objects>
+                <tableViewController storyboardIdentifier="VideoTable" id="37n-KG-bgh" customClass="VideoTable" customModule="ToothSense" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="200" sectionHeaderHeight="5" sectionFooterHeight="5" id="3h3-6l-kmt">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="separatorColor" red="0.97573274369999996" green="0.64573812480000004" blue="0.26096984740000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="sectionIndexBackgroundColor" red="0.97573274369999996" green="0.64573812480000004" blue="0.26096984740000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="sectionIndexTrackingBackgroundColor" red="0.97573274369999996" green="0.64573812480000004" blue="0.26096984740000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <sections>
+                            <tableViewSection headerTitle=" " footerTitle=" " id="yZ9-6a-bfe">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="firstCell" id="wyR-wI-f1H" customClass="VideoCell" customModule="ToothSense">
+                                        <rect key="frame" x="0.0" y="5" width="375" height="200"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="wyR-wI-f1H" id="Rss-P4-sAM">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="199"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoName" value="toby"/>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoExt" value="mov"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle=" " footerTitle=" " id="095-AH-fFk">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="secondCell" id="2bh-mP-JqR" customClass="VideoCell" customModule="ToothSense">
+                                        <rect key="frame" x="0.0" y="215" width="375" height="200"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="2bh-mP-JqR" id="Uf7-mk-feQ">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="200"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoName" value="babyteeth"/>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoExt" value="mov"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle=" " footerTitle=" " id="zeO-9b-nzL">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="thirdCell" id="Urj-xm-CkE" customClass="VideoCell" customModule="ToothSense">
+                                        <rect key="frame" x="0.0" y="425" width="375" height="200"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Urj-xm-CkE" id="xh4-Tb-LCP">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="200"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoName" value="babypart1"/>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoExt" value="mp4"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle=" " footerTitle=" " id="8vO-MS-1IJ">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="fourthCell" id="RRk-Ph-A4t" customClass="VideoCell" customModule="ToothSense">
+                                        <rect key="frame" x="0.0" y="635" width="375" height="200"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="RRk-Ph-A4t" id="D5L-1s-Wfw">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="200"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoName" value="babypart2"/>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoExt" value="mp4"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle=" " footerTitle=" " id="OxF-kF-Vo4">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="fifthCell" id="0xi-ca-RhK" customClass="VideoCell" customModule="ToothSense">
+                                        <rect key="frame" x="0.0" y="845" width="375" height="200"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="0xi-ca-RhK" id="b1k-5C-38F">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="200"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoName" value="babypart3"/>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoExt" value="mp4"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle=" " footerTitle=" " id="JOb-Nl-NZ3">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="fifthCell" id="PTJ-w8-SNj" userLabel="sixthCell" customClass="VideoCell" customModule="ToothSense">
+                                        <rect key="frame" x="0.0" y="1055" width="375" height="200"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="PTJ-w8-SNj" id="Mw4-iN-E4h">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="199"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" red="0.9529411793" green="0.68627452850000004" blue="0.13333334029999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoName" value="teething"/>
+                                            <userDefinedRuntimeAttribute type="string" keyPath="videoExt" value="mov"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="37n-KG-bgh" id="tER-VY-4kh"/>
+                            <outlet property="delegate" destination="37n-KG-bgh" id="bgP-ud-PpT"/>
+                        </connections>
+                    </tableView>
+                    <tabBarItem key="tabBarItem" title="Educational Videos" image="video" id="bwU-JU-Uuy" customClass="RAMAnimatedTabBarItem" customModule="ToothSense" customModuleProvider="target">
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="color" keyPath="textColor">
+                                <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="color" keyPath="iconColor">
+                                <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <outlet property="animation" destination="sXu-Nu-Gun" id="kUa-fX-wo0"/>
+                        </connections>
+                    </tabBarItem>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="VideoTableTabAnimation" destination="sXu-Nu-Gun" id="7Wx-E2-KXv"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="u4U-jw-f1f" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <customObject id="sXu-Nu-Gun" customClass="RAMFumeAnimation" customModule="ToothSense" customModuleProvider="target">
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="textSelectedColor">
+                            <color key="value" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="iconSelectedColor">
+                            <color key="value" red="0.7254902124" green="0.4784313738" blue="0.098039217289999994" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="duration">
+                            <real key="value" value="0.59999999999999998"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </customObject>
+            </objects>
+            <point key="canvasLocation" x="1548" y="815"/>
         </scene>
     </scenes>
     <resources>

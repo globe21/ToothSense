@@ -166,12 +166,12 @@ class LoginViewController: UIViewController, UITextFieldDelegate, NavgationTrans
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let ViewController:BuildViewController = storyboard.instantiateViewControllerWithIdentifier("BuildViewController") as! BuildViewController
                 let ProfileImage: PFImageView = PFImageView()
-                ProfileImage.file = PFUser.currentUser()!.getProfPic()
+                ProfileImage.file = PFUser.currentUser()!.profPic
                 ProfileImage.loadInBackground({ (image, error) in
                     if error == nil {
                         ViewController.profileImage = image!
-                        ViewController.fullname = PFUser.currentUser()!.Fullname()
-                        ViewController.age = PFUser.currentUser()!.getBirthday()
+                        ViewController.fullname = PFUser.currentUser()!.fullname
+                        ViewController.age = PFUser.currentUser()!.birthday
                         sideMenuNavigationController!.pushViewController(ViewController, animated: true)
                     } else {
                         sideMenuNavigationController!.pushViewController(ViewController, animated: true)
@@ -226,12 +226,44 @@ extension UIViewController {
                 popVC.reportTextView.shake()
             } else {
                 let text: String = popVC.reportTextView.text!
+                if PFUser.currentUser()!["WarnedPeople"] != nil {
+                    var WarnedPeople: [PFUser] = PFUser.currentUser()!["WarnedPeople"] as! [PFUser]
+                    var friendIDs: [String] = [String]()
+                    WarnedPeople.forEach({ (user) in
+                        friendIDs.append(user.objectId!)
+                    })
+                    if !friendIDs.contains(user.objectId!) {
+                        WarnedPeople.append(user)
+                        PFUser.currentUser()!["WarnedPeople"] = WarnedPeople
+                        PFUser.currentUser()!.saveInBackground()
+                    } else {
+                        if PFUser.currentUser()!["BlockedPeople"] != nil {
+                            var BlockedPeople: [PFUser] = PFUser.currentUser()!["BlockedPeople"] as! [PFUser]
+                            var friendIDs: [String] = [String]()
+                            BlockedPeople.forEach({ (user) in
+                                friendIDs.append(user.objectId!)
+                            })
+                            if !friendIDs.contains(user.objectId!) {
+                                BlockedPeople.append(user)
+                                PFUser.currentUser()!["BlockedPeople"] = BlockedPeople
+                                PFUser.currentUser()!.saveInBackground()
+                            }
+                        } else {
+                            PFUser.currentUser()!["BlockedPeople"] = [user]
+                            PFUser.currentUser()!.saveInBackground()
+                        }
+                    }
+                } else {
+                    PFUser.currentUser()!["WarnedPeople"] = [user]
+                    PFUser.currentUser()!.saveInBackground()
+                }
                 let object: PFObject = PFObject(className: "BlockReport")
                 object["User"] = user
+                object["From"] = PFUser.currentUser()!
                 object["Description"] = text
                 object.saveInBackgroundWithBlock({ (success, error) in
                     if error == nil {
-                        let popup2 = PopupDialog(title: "Report Received", message: text, image: nil)
+                        let popup2 = PopupDialog(title: "Report Received", message: "\(user.fullname): \(text)", image: nil)
                         let buttonCancel = CancelButton(title: "OK") { }
                         popup2.addButtons([buttonCancel])
                         self.presentViewController(popup2, animated: true, completion: nil)
